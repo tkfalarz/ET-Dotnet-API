@@ -1,8 +1,8 @@
 using System;
 
-namespace ET.WebAPI.Core.Entities
+namespace ET.WebAPI.DatabaseAccess.Entities
 {
-    public record PressureReading
+    public record AqiReading
     {
         public DateTimeOffset Timestamp { get; init; }
         public double Value { get; init; }

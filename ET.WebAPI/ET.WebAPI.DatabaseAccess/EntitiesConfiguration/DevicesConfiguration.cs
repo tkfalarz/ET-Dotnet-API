@@ -1,8 +1,8 @@
-using ET.WebAPI.Core.Entities;
+using ET.WebAPI.DatabaseAccess.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace ET.WebAPI.Api.Database
+namespace ET.WebAPI.Api.DatabaseAccess.EntitiesConfiguration
 {
     public class DevicesConfiguration : IEntityTypeConfiguration<Device>
     {

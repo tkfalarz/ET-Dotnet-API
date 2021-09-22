@@ -1,15 +1,15 @@
-using ET.WebAPI.Core.Entities;
+using ET.WebAPI.DatabaseAccess.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace ET.WebAPI.Api.Database
+namespace ET.WebAPI.Api.DatabaseAccess.EntitiesConfiguration
 {
     public class PressureReadingsConfiguration : IEntityTypeConfiguration<PressureReading>
     {
         public void Configure(EntityTypeBuilder<PressureReading> builder)
         {
             builder
-                .HasKey(x => new { x.Timestamp, x.Value })
+                .HasKey(x => new { x.Timestamp, x.Value, x.DeviceId })
                 .IsClustered();
         }
     }

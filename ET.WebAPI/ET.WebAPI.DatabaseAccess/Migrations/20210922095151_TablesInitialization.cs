@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace ET.WebAPI.Api.Migrations
+namespace ET.WebAPI.DatabaseAccess.Migrations
 {
     public partial class TablesInitialization : Migration
     {
@@ -32,7 +32,7 @@ namespace ET.WebAPI.Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AqiReadings", x => new { x.Timestamp, x.Value })
+                    table.PrimaryKey("PK_AqiReadings", x => new { x.Timestamp, x.Value, x.DeviceId })
                         .Annotation("SqlServer:Clustered", true);
                     table.ForeignKey(
                         name: "FK_AqiReadings_Devices_DeviceId",
@@ -52,7 +52,7 @@ namespace ET.WebAPI.Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_HumidityReadings", x => new { x.Timestamp, x.Value })
+                    table.PrimaryKey("PK_HumidityReadings", x => new { x.Timestamp, x.Value, x.DeviceId })
                         .Annotation("SqlServer:Clustered", true);
                     table.ForeignKey(
                         name: "FK_HumidityReadings_Devices_DeviceId",
@@ -72,7 +72,7 @@ namespace ET.WebAPI.Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PressureReadings", x => new { x.Timestamp, x.Value })
+                    table.PrimaryKey("PK_PressureReadings", x => new { x.Timestamp, x.Value, x.DeviceId })
                         .Annotation("SqlServer:Clustered", true);
                     table.ForeignKey(
                         name: "FK_PressureReadings_Devices_DeviceId",
@@ -92,7 +92,7 @@ namespace ET.WebAPI.Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TemperatureReadings", x => new { x.Timestamp, x.Value })
+                    table.PrimaryKey("PK_TemperatureReadings", x => new { x.Timestamp, x.Value, x.DeviceId })
                         .Annotation("SqlServer:Clustered", true);
                     table.ForeignKey(
                         name: "FK_TemperatureReadings_Devices_DeviceId",

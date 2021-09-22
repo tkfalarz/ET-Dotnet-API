@@ -1,11 +1,12 @@
-using ET.WebAPI.Core.Entities;
+using ET.WebAPI.Api.DatabaseAccess.EntitiesConfiguration;
+using ET.WebAPI.DatabaseAccess.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace ET.WebAPI.Api.Database
+namespace ET.WebAPI.DatabaseAccess.DatabaseSetup
 {
-    public class ApplicationDbContext : DbContext
+    public class ApiDbContext : DbContext
     {
-        public ApplicationDbContext(DbContextOptions options) : base(options)
+        public ApiDbContext(DbContextOptions options) : base(options)
         {
         }
 
@@ -24,5 +25,6 @@ namespace ET.WebAPI.Api.Database
                 .ApplyConfiguration(new PressureReadingsConfiguration())
                 .ApplyConfiguration(new TemperatureReadingsConfiguration());
         }
+
     }
 }

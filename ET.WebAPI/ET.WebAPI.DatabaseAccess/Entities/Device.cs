@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace ET.WebAPI.Core.Entities
+namespace ET.WebAPI.DatabaseAccess.Entities
 {
     public record Device
     {

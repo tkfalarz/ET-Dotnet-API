@@ -1,4 +1,4 @@
-using ET.WebAPI.Api.Database;
+using ET.WebAPI.DatabaseAccess.DatabaseSetup;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System;
 using System.Collections.Generic;
@@ -29,7 +29,8 @@ namespace ET.WebAPI.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration["ConnectionString:ApplicationDb"]));
+            services.AddDbContextFactory<ApiDbContext>();
+            services.AddLogging();
             services.AddControllers();
             services.AddSwaggerGen(
                 c =>
