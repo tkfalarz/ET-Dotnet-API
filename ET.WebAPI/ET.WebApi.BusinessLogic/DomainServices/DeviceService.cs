@@ -3,6 +3,7 @@ using ET.WebAPI.DatabaseAccess.Entities;
 using ET.WebAPI.Kernel;
 using ET.WebAPI.Kernel.DomainModels;
 using ET.WebAPI.Kernel.DomainServices;
+using ET.WebAPI.Kernel.ErrorsHandling;
 using System.Threading.Tasks;
 using GoogleMaps.LocationServices;
 using RandomFriendlyNameGenerator;
@@ -26,7 +27,7 @@ namespace ET.WebApi.BusinessLogic.DomainServices
             
             var searchingResult = dbContext.Devices.Where(x => x.Id.Equals(device.Id));
             if (searchingResult.Any()) 
-                return OperationResult.Failure("Device already exists");
+                return OperationResult.Failure("Device already exists", ErrorType.Internal);
 
             await dbContext.Devices.AddAsync(new Device
             {

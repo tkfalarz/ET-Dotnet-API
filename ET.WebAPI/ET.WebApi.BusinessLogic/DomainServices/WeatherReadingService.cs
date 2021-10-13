@@ -3,6 +3,7 @@ using ET.WebAPI.DatabaseAccess.Entities;
 using ET.WebAPI.Kernel;
 using ET.WebAPI.Kernel.DomainModels;
 using ET.WebAPI.Kernel.DomainServices;
+using ET.WebAPI.Kernel.ErrorsHandling;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
@@ -25,7 +26,7 @@ namespace ET.WebAPI.BusinessLogic.DomainServices
 
             var device = await dbContext.Devices.FirstOrDefaultAsync(x => x.Name == weatherReading.DeviceName);
             if (device.Equals(default))
-                return OperationResult.Failure("Device not exist");
+                return OperationResult.Failure("Device not exist", ErrorType.Internal);
 
             await dbContext.AqiReadings.AddAsync(
                 new AqiReading
