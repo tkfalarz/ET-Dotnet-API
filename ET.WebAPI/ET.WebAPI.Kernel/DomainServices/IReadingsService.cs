@@ -4,8 +4,9 @@ using System.Threading.Tasks;
 
 namespace ET.WebAPI.Kernel.DomainServices
 {
-    public interface IWeatherReadingService
+    public interface IReadingsService
     {
-        Task<OperationResult> StoreWeatherReadingAsync(WeatherReadingModel weatherReading);
+        Task<OperationResult> StoreWeatherReadingAsync(DeviceReading deviceReading);
+        
     }
 }

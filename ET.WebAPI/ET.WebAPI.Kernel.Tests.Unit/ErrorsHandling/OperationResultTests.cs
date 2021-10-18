@@ -14,13 +14,13 @@ namespace ET.WebAPI.Kernel.Tests.Unit.ErrorsHandling
         {
             const string errorMessage = "ErrorMessage"; 
             
-            var result = OperationResult.Failure(errorMessage, ErrorType.Internal);
+            var result = OperationResult.Failure(errorMessage, ErrorType.BusinessLogic);
 
             result.ErrorMessage.Should().NotBeNull().And.Be(errorMessage);
         }
 
-        [TestCase(ErrorType.Internal)]
-        [TestCase(ErrorType.User)]
+        [TestCase(ErrorType.BusinessLogic)]
+        [TestCase(ErrorType.Api)]
         [TestCase(ErrorType.None)]
         public void WhenFailureThenOperationResultShouldHaveErrorType(ErrorType errorType)
         {

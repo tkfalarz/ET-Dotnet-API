@@ -1,4 +1,8 @@
+using ET.WebAPI.BusinessLogic.DomainServices;
 using ET.WebAPI.DatabaseAccess.DatabaseSetup;
+using ET.WebAPI.DatabaseAccess.Repositories;
+using ET.WebAPI.Kernel.DomainServices;
+using ET.WebAPI.Kernel.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System;
 using System.Collections.Generic;
@@ -32,6 +36,7 @@ namespace ET.WebAPI.Api
             services.AddDbContextFactory<ApiDbContext>();
             services.AddLogging();
             services.AddControllers();
+            services.AddServices();
             services.AddSwaggerGen(
                 c =>
                 {

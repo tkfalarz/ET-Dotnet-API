@@ -10,6 +10,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ET.WebAPI.BusinessLogic", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ET.WebAPI.Kernel.Tests.Unit", "ET.WebAPI.Kernel.Tests.Unit\ET.WebAPI.Kernel.Tests.Unit.csproj", "{9B1FF0F6-AC63-4F82-ADBE-8F57D6A0D2A6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ET.WebAPI.Api.Tests.Unit", "ET.WebAPI.Api.Tests.Unit\ET.WebAPI.Api.Tests.Unit.csproj", "{9C75ED61-1F29-4A04-AF8D-7B7D65C619DE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ET.WebAPI.BusinessLogic.Tests.Unit", "ET.WebAPI.BusinessLogic.Tests.Unit\ET.WebAPI.BusinessLogic.Tests.Unit.csproj", "{0AC09A12-0C13-4191-8042-E397B4D0341F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +40,13 @@ Global
 		{9B1FF0F6-AC63-4F82-ADBE-8F57D6A0D2A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9B1FF0F6-AC63-4F82-ADBE-8F57D6A0D2A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9B1FF0F6-AC63-4F82-ADBE-8F57D6A0D2A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C75ED61-1F29-4A04-AF8D-7B7D65C619DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C75ED61-1F29-4A04-AF8D-7B7D65C619DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C75ED61-1F29-4A04-AF8D-7B7D65C619DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C75ED61-1F29-4A04-AF8D-7B7D65C619DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0AC09A12-0C13-4191-8042-E397B4D0341F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0AC09A12-0C13-4191-8042-E397B4D0341F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0AC09A12-0C13-4191-8042-E397B4D0341F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0AC09A12-0C13-4191-8042-E397B4D0341F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

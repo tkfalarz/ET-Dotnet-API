@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 
 namespace ET.WebAPI.Kernel.DomainServices
 {
-    public interface IDeviceService
+    public interface IDevicesService
     {
-        Task<OperationResult> StoreDeviceAsync(DeviceModel device);
+        Task<OperationResult> StoreDeviceAsync(Device device);
     }
 }

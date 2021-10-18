@@ -2,10 +2,10 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 
-namespace ET.WebAPI.Kernel.DomainModels
+namespace ET.WebAPI.Api.Views
 {
     [DataContract]
-    public record WeatherReadingModel
+    public class DeviceReadingView
     {
         [DataMember, Required]
         public DateTimeOffset Timestamp { get; init; }

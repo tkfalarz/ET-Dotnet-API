@@ -1,3 +1,5 @@
+using ET.WebAPI.Api.Extensions;
+using ET.WebAPI.Api.Views;
 using ET.WebAPI.DatabaseAccess.DatabaseSetup;
 using ET.WebAPI.DatabaseAccess.Entities;
 using ET.WebAPI.Kernel.DomainModels;
@@ -9,26 +11,27 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace ET.WebAPI.Api.Controllers
 {
     [ApiController]
-    [Route("WeatherFactors")]
-    public class WeatherFactorsController : ControllerBase
+    [Route("api/Readings")]
+    public class ReadingsController : ControllerBase
     {
-        private readonly IWeatherReadingService readingService;
-        private readonly ILogger<WeatherFactorsController> logger;
+        private readonly IReadingsService readingsService;
+        private readonly ILogger<ReadingsController> logger;
 
-        public WeatherFactorsController(IWeatherReadingService readingService, ILogger<WeatherFactorsController> logger)
+        public ReadingsController(IReadingsService readingsService, ILogger<ReadingsController> logger)
         {
-            this.readingService = readingService ?? throw new ArgumentNullException(nameof(readingService));
+            this.readingsService = readingsService;
+            this.logger = logger;
         }
 
         [HttpPost]
         [Authorize]
-        [Route("Store")]
-        public async Task<IActionResult> StoreFactorsAsync([FromBody, Required] WeatherReadingModel reading)
+        public async Task<IActionResult> StoreReadingAsync([FromBody, Required] DeviceReadingView reading)
         {
             if (!ModelState.IsValid)
             {
@@ -37,11 +40,11 @@ namespace ET.WebAPI.Api.Controllers
                 return BadRequest();
             }
 
-            var result = await readingService.StoreWeatherReadingAsync(reading);
+            var result = await readingsService.StoreWeatherReadingAsync(reading.ToModel());
             if (!result.IsProceeded)
             {
                 logger.LogError(result.ErrorMessage);
-                return BadRequest();
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
 
             return Accepted();
