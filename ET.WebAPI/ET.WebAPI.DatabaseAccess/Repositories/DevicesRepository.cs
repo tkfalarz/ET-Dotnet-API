@@ -13,11 +13,9 @@ namespace ET.WebAPI.DatabaseAccess.Repositories
     public class DevicesRepository : IDevicesRepository
     {
         private readonly ApiDbContext dbContext;
-        private readonly ILogger<DevicesRepository> logger;
-        public DevicesRepository(ApiDbContext dbContext, ILogger<DevicesRepository> logger)
+        public DevicesRepository(ApiDbContext dbContext)
         {
             this.dbContext = dbContext;
-            this.logger = logger;
         }
 
         public async Task<OperationResult<Guid>> GetDeviceIdAsync(string deviceName)
@@ -26,10 +24,9 @@ namespace ET.WebAPI.DatabaseAccess.Repositories
                 throw new ArgumentNullException(nameof(deviceName), "Device name cannot be null or empty");
 
             var result = await dbContext.Devices.FirstOrDefaultAsync(x => x.Name == deviceName);
-            if (result == default)
+            if (result == null)
             {
                 return OperationResult<Guid>.Failure($"Device {deviceName} not found", ErrorType.Entity);
-
             }
 
             return OperationResult<Guid>.Proceeded(result.Id);
@@ -45,7 +42,8 @@ namespace ET.WebAPI.DatabaseAccess.Repositories
                 {
                     Latitude = device.Latitude,
                     Longitude = device.Longitude,
-                    Name = device.SensorName
+                    Name = device.DeviceName,
+                    SensorName = device.SensorName
                 });
 
             await dbContext.SaveChangesAsync();

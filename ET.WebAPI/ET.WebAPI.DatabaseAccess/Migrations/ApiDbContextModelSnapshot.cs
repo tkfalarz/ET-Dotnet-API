@@ -125,7 +125,7 @@ namespace ET.WebAPI.DatabaseAccess.Migrations
             modelBuilder.Entity("ET.WebAPI.DatabaseAccess.Entities.AqiReading", b =>
                 {
                     b.HasOne("ET.WebAPI.DatabaseAccess.Entities.Device", "Device")
-                        .WithMany()
+                        .WithMany("AqiReadings")
                         .HasForeignKey("DeviceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -136,7 +136,7 @@ namespace ET.WebAPI.DatabaseAccess.Migrations
             modelBuilder.Entity("ET.WebAPI.DatabaseAccess.Entities.HumidityReading", b =>
                 {
                     b.HasOne("ET.WebAPI.DatabaseAccess.Entities.Device", "Device")
-                        .WithMany()
+                        .WithMany("HumidityReadings")
                         .HasForeignKey("DeviceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -147,7 +147,7 @@ namespace ET.WebAPI.DatabaseAccess.Migrations
             modelBuilder.Entity("ET.WebAPI.DatabaseAccess.Entities.PressureReading", b =>
                 {
                     b.HasOne("ET.WebAPI.DatabaseAccess.Entities.Device", "Device")
-                        .WithMany()
+                        .WithMany("PressureReadings")
                         .HasForeignKey("DeviceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -158,7 +158,7 @@ namespace ET.WebAPI.DatabaseAccess.Migrations
             modelBuilder.Entity("ET.WebAPI.DatabaseAccess.Entities.TemperatureReading", b =>
                 {
                     b.HasOne("ET.WebAPI.DatabaseAccess.Entities.Device", "Device")
-                        .WithMany()
+                        .WithMany("TemperatureReadings")
                         .HasForeignKey("DeviceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ET.WebAPI.DatabaseAccess.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    [Migration("20210922095151_TablesInitialization")]
+    [Migration("20211020122559_TablesInitialization")]
     partial class TablesInitialization
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -32,15 +32,10 @@ namespace ET.WebAPI.DatabaseAccess.Migrations
                     b.Property<Guid>("DeviceId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("DeviceId1")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Timestamp", "Value", "DeviceId")
                         .IsClustered();
 
                     b.HasIndex("DeviceId");
-
-                    b.HasIndex("DeviceId1");
 
                     b.ToTable("AqiReadings");
                 });
@@ -83,15 +78,10 @@ namespace ET.WebAPI.DatabaseAccess.Migrations
                     b.Property<Guid>("DeviceId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("DeviceId1")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Timestamp", "Value", "DeviceId")
                         .IsClustered();
 
                     b.HasIndex("DeviceId");
-
-                    b.HasIndex("DeviceId1");
 
                     b.ToTable("HumidityReadings");
                 });
@@ -107,15 +97,10 @@ namespace ET.WebAPI.DatabaseAccess.Migrations
                     b.Property<Guid>("DeviceId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("DeviceId1")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Timestamp", "Value", "DeviceId")
                         .IsClustered();
 
                     b.HasIndex("DeviceId");
-
-                    b.HasIndex("DeviceId1");
 
                     b.ToTable("PressureReadings");
                 });
@@ -131,15 +116,10 @@ namespace ET.WebAPI.DatabaseAccess.Migrations
                     b.Property<Guid>("DeviceId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("DeviceId1")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Timestamp", "Value", "DeviceId")
                         .IsClustered();
 
                     b.HasIndex("DeviceId");
-
-                    b.HasIndex("DeviceId1");
 
                     b.ToTable("TemperatureReadings");
                 });
@@ -147,14 +127,10 @@ namespace ET.WebAPI.DatabaseAccess.Migrations
             modelBuilder.Entity("ET.WebAPI.DatabaseAccess.Entities.AqiReading", b =>
                 {
                     b.HasOne("ET.WebAPI.DatabaseAccess.Entities.Device", "Device")
-                        .WithMany()
+                        .WithMany("AqiReadings")
                         .HasForeignKey("DeviceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("ET.WebAPI.DatabaseAccess.Entities.Device", null)
-                        .WithMany("AqiReadings")
-                        .HasForeignKey("DeviceId1");
 
                     b.Navigation("Device");
                 });
@@ -162,14 +138,10 @@ namespace ET.WebAPI.DatabaseAccess.Migrations
             modelBuilder.Entity("ET.WebAPI.DatabaseAccess.Entities.HumidityReading", b =>
                 {
                     b.HasOne("ET.WebAPI.DatabaseAccess.Entities.Device", "Device")
-                        .WithMany()
+                        .WithMany("HumidityReadings")
                         .HasForeignKey("DeviceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("ET.WebAPI.DatabaseAccess.Entities.Device", null)
-                        .WithMany("HumidityReadings")
-                        .HasForeignKey("DeviceId1");
 
                     b.Navigation("Device");
                 });
@@ -177,14 +149,10 @@ namespace ET.WebAPI.DatabaseAccess.Migrations
             modelBuilder.Entity("ET.WebAPI.DatabaseAccess.Entities.PressureReading", b =>
                 {
                     b.HasOne("ET.WebAPI.DatabaseAccess.Entities.Device", "Device")
-                        .WithMany()
+                        .WithMany("PressureReadings")
                         .HasForeignKey("DeviceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("ET.WebAPI.DatabaseAccess.Entities.Device", null)
-                        .WithMany("PressureReadings")
-                        .HasForeignKey("DeviceId1");
 
                     b.Navigation("Device");
                 });
@@ -192,14 +160,10 @@ namespace ET.WebAPI.DatabaseAccess.Migrations
             modelBuilder.Entity("ET.WebAPI.DatabaseAccess.Entities.TemperatureReading", b =>
                 {
                     b.HasOne("ET.WebAPI.DatabaseAccess.Entities.Device", "Device")
-                        .WithMany()
+                        .WithMany("TemperatureReadings")
                         .HasForeignKey("DeviceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("ET.WebAPI.DatabaseAccess.Entities.Device", null)
-                        .WithMany("TemperatureReadings")
-                        .HasForeignKey("DeviceId1");
 
                     b.Navigation("Device");
                 });

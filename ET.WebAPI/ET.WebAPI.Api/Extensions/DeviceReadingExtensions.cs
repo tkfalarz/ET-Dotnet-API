@@ -4,21 +4,21 @@ using System;
 
 namespace ET.WebAPI.Api.Extensions
 {
-    public static class WeatherReadingExtensions
+    public static class DeviceReadingExtensions
     {
         public static DeviceReading ToModel(this DeviceReadingView view)
         {
-            if (view == default)
-                throw new ArgumentNullException(nameof(view), "The view is null");
+            if (view == null)
+                throw new ArgumentNullException(nameof(view));
 
             return new DeviceReading
             {
                 Humidity = view.Humidity,
                 Pressure = view.Pressure,
-                Temperature = view.Pressure,
+                Temperature = view.Temperature,
                 Timestamp = view.Timestamp,
-                DeviceName = view.DeviceName,
-                AirQualityIndex = view.AirQualityIndex
+                AirQualityIndex = view.AirQualityIndex,
+                DeviceName = view.DeviceName
             };
         }
     }

@@ -10,9 +10,9 @@ namespace ET.WebAPI.DatabaseAccess.Entities
         public string SensorName { get; init; }
         public string Latitude { get; init; }
         public string Longitude { get; init; }
-        public List<AqiReading> AqiReadings { get; init; }
-        public List<HumidityReading> HumidityReadings { get; init; }
-        public List<PressureReading> PressureReadings { get; init; }
-        public List<TemperatureReading> TemperatureReadings { get; init; }
+        public ICollection<AqiReading> AqiReadings { get; init; }
+        public ICollection<HumidityReading> HumidityReadings { get; init; }
+        public ICollection<PressureReading> PressureReadings { get; init; }
+        public ICollection<TemperatureReading> TemperatureReadings { get; init; }
     }
 }

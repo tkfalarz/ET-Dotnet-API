@@ -13,30 +13,6 @@ namespace ET.WebAPI.Api.DatabaseAccess.EntitiesConfiguration
             builder.Property(p => p.Latitude).IsRequired();
             builder.Property(p => p.Longitude).IsRequired();
             builder.Property(x => x.SensorName).IsRequired();
-            builder
-                .HasMany<AqiReading>()
-                .WithOne(x => x.Device)
-                .HasForeignKey(x => x.DeviceId)
-                .IsRequired()
-                .OnDelete(DeleteBehavior.Cascade);
-            builder
-                .HasMany<HumidityReading>()
-                .WithOne(x => x.Device)
-                .HasForeignKey(x => x.DeviceId)
-                .IsRequired()
-                .OnDelete(DeleteBehavior.Cascade);
-            builder
-                .HasMany<PressureReading>()
-                .WithOne(x => x.Device)
-                .HasForeignKey(x => x.DeviceId)
-                .IsRequired()
-                .OnDelete(DeleteBehavior.Cascade);
-            builder
-                .HasMany<TemperatureReading>()
-                .WithOne(x => x.Device)
-                .HasForeignKey(x => x.DeviceId)
-                .IsRequired()
-                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

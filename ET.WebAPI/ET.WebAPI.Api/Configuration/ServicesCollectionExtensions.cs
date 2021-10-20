@@ -1,4 +1,4 @@
-using ET.WebAPI.BusinessLogic.DomainServices;
+using ET.WebAPI.BusinessLogic.Services;
 using ET.WebAPI.DatabaseAccess.Repositories;
 using ET.WebAPI.Kernel.DomainServices;
 using ET.WebAPI.Kernel.Repositories;

@@ -12,27 +12,24 @@ using System.Linq;
 using System.Threading.Tasks;
 using Device = ET.WebAPI.Kernel.DomainModels.Device;
 
-namespace ET.WebAPI.BusinessLogic.DomainServices
+namespace ET.WebAPI.BusinessLogic.Services
 {
     public class ReadingsService : IReadingsService
     {
-        private readonly ApiDbContext dbContext;
         private readonly IReadingsRepository readingsRepository;
         private readonly IDevicesRepository devicesRepository;
 
         public ReadingsService(
-            ApiDbContext dbContext,
             IReadingsRepository readingsRepository,
             IDevicesRepository devicesRepository)
         {
-            this.dbContext = dbContext;
             this.readingsRepository = readingsRepository;
             this.devicesRepository = devicesRepository;
         }
 
         public async Task<OperationResult> StoreWeatherReadingAsync(DeviceReading deviceReading)
         {
-            if (deviceReading.Equals(default)) throw new ArgumentNullException(nameof(deviceReading));
+            if (deviceReading == null) throw new ArgumentNullException(nameof(deviceReading));
 
             var deviceIdGetOperationResult = await devicesRepository.GetDeviceIdAsync(deviceReading.DeviceName);
             if (deviceIdGetOperationResult.IsFailure)

@@ -7,7 +7,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
-namespace ET.WebAPI.BusinessLogic.DomainServices
+namespace ET.WebAPI.BusinessLogic.Services
 {
     public class DevicesService : IDevicesService
     {
@@ -20,10 +20,7 @@ namespace ET.WebAPI.BusinessLogic.DomainServices
 
         public async Task<OperationResult> StoreDeviceAsync(Device device)
         {
-            if (device == default || !device.IsValid)
-                return OperationResult.Failure(
-                    $"{nameof(device)} | {OperationErrorMessages.ObjectInvalid}",
-                    ErrorType.BusinessLogic);
+            if (device == null) throw new ArgumentNullException(nameof(device));
 
             try
             {

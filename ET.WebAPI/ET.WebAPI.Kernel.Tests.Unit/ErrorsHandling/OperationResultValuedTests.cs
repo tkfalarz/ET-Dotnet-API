@@ -2,19 +2,19 @@ using ET.WebAPI.Kernel.ErrorsHandling;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
-using NUnit.Framework.Constraints;
 using System;
 
 namespace ET.WebAPI.Kernel.Tests.Unit.ErrorsHandling
 {
-    public class OperationResultTests
+    [TestFixture]
+    public class OperationResultValuedTests
     {
         [Test]
         public void WhenFailureThenOperationResultShouldHaveErrorMessage()
         {
             const string errorMessage = "ErrorMessage"; 
             
-            var result = OperationResult.Failure(errorMessage, ErrorType.BusinessLogic);
+            var result = OperationResult<string>.Failure(errorMessage, ErrorType.BusinessLogic);
 
             result.ErrorMessage.Should().NotBeNull().And.Be(errorMessage);
         }
@@ -24,7 +24,7 @@ namespace ET.WebAPI.Kernel.Tests.Unit.ErrorsHandling
         [TestCase(ErrorType.None)]
         public void WhenFailureThenOperationResultShouldHaveErrorType(ErrorType errorType)
         {
-            var result = OperationResult.Failure("ErrorMessage", errorType);
+            var result = OperationResult<string>.Failure("ErrorMessage", errorType);
 
             result.ErrorType.Should().Be(errorType);
         }
@@ -32,7 +32,7 @@ namespace ET.WebAPI.Kernel.Tests.Unit.ErrorsHandling
         [Test]
         public void WhenFailureThenOperationResultShouldHaveNegativeIsProceededFlag()
         {
-            var result = OperationResult.Failure(string.Empty, It.IsAny<ErrorType>());
+            var result = OperationResult<string>.Failure(string.Empty, It.IsAny<ErrorType>());
 
             result.IsProceeded.Should().BeFalse();
         }
@@ -40,7 +40,7 @@ namespace ET.WebAPI.Kernel.Tests.Unit.ErrorsHandling
         [Test]
         public void WhenFailureErrorMessageIsNullThenInvalidOperationExceptionIsThrown()
         {
-            Action action = () => OperationResult.Failure(default, ErrorType.None);
+            Action action = () => OperationResult<string>.Failure(default, ErrorType.None);
 
             action.Should().Throw<InvalidOperationException>().Which.Message.Should().Be("Error message cannot be null");
         }
@@ -48,15 +48,24 @@ namespace ET.WebAPI.Kernel.Tests.Unit.ErrorsHandling
         [Test]
         public void WhenProceededThenOperationResultShouldHaveNoneErrorType()
         {
-            var result = OperationResult.Proceeded();
+            var result = OperationResult<string>.Proceeded("Any string");
 
             result.ErrorType.Should().Be(ErrorType.None);
+        }
+        
+        [Test]
+        public void WhenProceededThenOperationResultValueShouldHaveValue()
+        {
+            var expectedData = "any data";
+            var result = OperationResult<string>.Proceeded(expectedData);
+
+            result.Value.Should().Be(expectedData);
         }
 
         [Test]
         public void WhenProceededThenOperationResultShouldHaveEmptyErrorMessage()
         {
-            var result = OperationResult.Proceeded();
+            var result = OperationResult<string>.Proceeded("any data");
 
             result.ErrorMessage.Should().BeEmpty();
         }
@@ -64,17 +73,9 @@ namespace ET.WebAPI.Kernel.Tests.Unit.ErrorsHandling
         [Test]
         public void WhenProceededThenOperationResultShouldHavePositiveIsProceededFlag()
         {
-            var result = OperationResult.Proceeded();
+            var result = OperationResult<string>.Proceeded("any data");
 
             result.IsProceeded.Should().BeTrue();
-        }
-
-        [TestCaseSource(typeof(OperationResultTestCases), nameof(OperationResultTestCases.EqualsTestCases))]
-        public void EqualsTests(OperationResult firstObject, OperationResult secondObject, bool expected)
-        {
-            var result = firstObject.Equals(secondObject);
-
-            result.Should().Be(expected);
         }
     }
 }

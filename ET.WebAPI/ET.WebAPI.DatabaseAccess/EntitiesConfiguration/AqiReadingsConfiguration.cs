@@ -11,6 +11,10 @@ namespace ET.WebAPI.Api.DatabaseAccess.EntitiesConfiguration
             builder
                 .HasKey(x => new { x.Timestamp, x.Value, x.DeviceId })
                 .IsClustered();
+            // builder
+            //     .HasOne(x => x.Device)
+            //     .WithMany(x => x.AqiReadings)
+            //     .HasForeignKey(x => x.DeviceId);
         }
     }
 }

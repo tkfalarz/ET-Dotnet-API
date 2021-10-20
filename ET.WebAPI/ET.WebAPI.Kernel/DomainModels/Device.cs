@@ -6,9 +6,9 @@ namespace ET.WebAPI.Kernel.DomainModels
 {
     public record Device
     {
+        public string DeviceName { get; init; }
         public string SensorName { get; init; }
         public string Latitude { get; init; }
         public string Longitude { get; init; }
-        public bool IsValid => SensorName != null && Latitude != null && Longitude != null;
     }
 }

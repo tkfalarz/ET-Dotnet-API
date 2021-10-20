@@ -1,4 +1,4 @@
-using ET.WebAPI.BusinessLogic.DomainServices;
+using ET.WebAPI.BusinessLogic.Services;
 using ET.WebAPI.DatabaseAccess.DatabaseSetup;
 using ET.WebAPI.DatabaseAccess.Repositories;
 using ET.WebAPI.Kernel.DomainServices;
@@ -30,7 +30,6 @@ namespace ET.WebAPI.Api
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContextFactory<ApiDbContext>();

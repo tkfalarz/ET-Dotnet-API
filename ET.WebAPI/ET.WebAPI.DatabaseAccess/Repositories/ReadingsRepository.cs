@@ -15,17 +15,15 @@ namespace ET.WebAPI.DatabaseAccess.Repositories
     public class ReadingsRepository : IReadingsRepository
     {
         private readonly ApiDbContext dbContext;
-        private readonly IDevicesRepository repository;
 
-        public ReadingsRepository(ApiDbContext dbContext, IDevicesRepository repository)
+        public ReadingsRepository(ApiDbContext dbContext)
         {
             this.dbContext = dbContext;
-            this.repository = repository;
         }
 
         public async Task StoreWeatherFactorsAsync(WeatherReading weatherReading, Guid deviceId)
         {
-            if (weatherReading == default || deviceId == default)
+            if (weatherReading == null)
                 throw new ArgumentNullException("Weather reading or device id cannot be null");
 
             await dbContext.AqiReadings.AddAsync(

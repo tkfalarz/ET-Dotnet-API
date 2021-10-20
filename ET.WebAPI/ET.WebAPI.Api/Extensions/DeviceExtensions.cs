@@ -8,11 +8,12 @@ namespace ET.WebAPI.Api.Extensions
     {
         public static Device ToModel(this DeviceView view)
         {
-            if (view == default)
-                throw new ArgumentNullException(nameof(view), "View cannot be null");
+            if (view == null)
+                throw new ArgumentNullException(nameof(view));
 
             return new Device
             {
+                DeviceName = view.DeviceName,
                 SensorName = view.SensorName,
                 Latitude = view.Latitude,
                 Longitude = view.Longitude
