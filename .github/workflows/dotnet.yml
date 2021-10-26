@@ -13,11 +13,14 @@ jobs:
       ENVIRONMENT: ASPNETCORE_ENVIRONMENT
     steps:
     - uses: actions/checkout@v2
-    
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 5.0.x
+        
+    - uses: actions/checkout@v2
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag dotnet-api:$(date +%s)
         
     - name: Restore dependencies
       run: dotnet restore
@@ -33,3 +36,5 @@ jobs:
         
     - name: Test
       run: dotnet test --no-build --verbosity normal
+      env:
+        ApiDb: "Server=localhost;Uid=sa;Password=test;Persist Security Info=True;
