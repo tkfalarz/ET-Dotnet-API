@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  Unit Tests:
+  Unit:
     runs-on: ubuntu-latest
     env:
       ENVIRONMENT: Development
@@ -24,7 +24,7 @@ jobs:
     - name: Build
       run: dotnet build --no-restore
       
-  Integration Tests:
+  Integration:
     runs-on: ubuntu-latest
     env:
       ENVIRONMENT: Development
