@@ -13,6 +13,8 @@ jobs:
       ENVIRONMENT: ASPNETCORE_ENVIRONMENT
     steps:
     - uses: actions/checkout@v2
+    - name: Root directory
+      run: echo "root folder is $GITHUB_WORKSPACE/somePath"
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
@@ -21,8 +23,6 @@ jobs:
     - uses: actions/checkout@v2
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag dotnet-api:$(date +%s)
-    - name: Root directory
-      run: echo "root folder is $GITHUB_WORKSPACE/somePath"
         
     - name: Restore dependencies
       run: dotnet restore
