@@ -25,7 +25,7 @@ jobs:
       run: dotnet build --no-restore
 
     - name: Test
-      run: dotnet test *.Tests.Unit.csproj --no-restore
+      run: dotnet test '/**/**/**/Tests.Unit' --no-build --verbosity normal
       
   Integration:
     runs-on: ubuntu-latest
@@ -52,4 +52,4 @@ jobs:
         sa password: test
         
     - name: Test
-      run: dotnet test *.Tests.Integration.csproj --no-build --verbosity normal
+      run: dotnet test '/**/**/**/Tests.Integration' --no-build --verbosity normal
