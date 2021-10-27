@@ -1,0 +1,52 @@
+name: .NET Unit and Integration Testing
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  Unit Tests:
+    runs-on: ubuntu-latest
+    env:
+      ENVIRONMENT: Development
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+        
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Build
+      run: dotnet build --no-restore
+      
+  Integration Tests:
+    runs-on: ubuntu-latest
+    env:
+      ENVIRONMENT: Development
+      ApiDb: "Server=localhost;Uid=sa;Password=test;Persist Security Info=True;"
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+        
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Build
+      run: dotnet build --no-restore
+
+    - name: Start SqlServer
+      uses: 280780363/sqlserver-action@v1.0
+      with:
+        accept eula: true
+        sa password: test
+        
+    - name: Test
+      run: dotnet test --no-build --verbosity normal
