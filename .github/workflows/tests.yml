@@ -30,8 +30,6 @@ jobs:
       with:
         accept eula: Y
         sa password: test
-      ports:
-       - 1433:1433
         
     - name: Test
       run: dotnet test --no-build --verbosity normal
