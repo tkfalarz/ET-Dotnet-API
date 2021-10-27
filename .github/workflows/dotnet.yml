@@ -18,18 +18,18 @@ jobs:
       with:
         dotnet-version: 5.0.x
         
-    - uses: actions/checkout@v2
-    - name: Build the Docker image
-      run: docker build . --file $GITHUB_WORKSPACE/ET.WebAPI/ET.WebAPI.Api/Dockerfile --tag dotnet-api:$(date +%s)
-        
     - name: Restore dependencies
       run: dotnet restore
       
     - name: Build
       run: dotnet build --no-restore
       
+    - uses: actions/checkout@v2
+    - name: Build the Docker image
+      run: docker build . --file $GITHUB_WORKSPACE/ET.WebAPI/ET.WebAPI.Api/Dockerfile --tag dotnet-api:$(date +%s)
+      
+    - uses: 280780363/sqlserver-action@v1.0
     - name: Start SqlServer
-      uses: 280780363/sqlserver-action@v1.0
       with:
         accept eula: true
         sa password: test
