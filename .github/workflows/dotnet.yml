@@ -28,8 +28,8 @@ jobs:
     - name: Build the Docker image
       run: docker build . --file $GITHUB_WORKSPACE/ET.WebAPI/ET.WebAPI.Api/Dockerfile --tag dotnet-api:$(date +%s)
       
-    - uses: 280780363/sqlserver-action@v1.0
     - name: Start SqlServer
+    - uses: 280780363/sqlserver-action@v1.0
       with:
         accept eula: true
         sa password: test
