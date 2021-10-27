@@ -23,12 +23,15 @@ jobs:
       
     - name: Build
       run: dotnet build --no-restore
+
+    - name: Test
+      run: dotnet test *.Tests.Unit.csproj --no-restore
       
   Integration:
     runs-on: ubuntu-latest
     env:
       ENVIRONMENT: Development
-      ApiDb: "Server=localhost;Uid=sa;Password=test;Persist Security Info=True;"
+      GITHUB_WORKFLOW_CONNECTION_STRING: "Server=localhost;Uid=sa;Password=test;Persist Security Info=True;"
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET
@@ -49,4 +52,4 @@ jobs:
         sa password: test
         
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test *.Tests.Integration.csproj --no-build --verbosity normal
