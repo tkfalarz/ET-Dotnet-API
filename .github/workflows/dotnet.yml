@@ -20,7 +20,7 @@ jobs:
         
     - uses: actions/checkout@v2
     - name: Build the Docker image
-      run: docker build $GITHUB_WORKSPACE/ET.WebAPI/ET.WebAPI.Api --file Dockerfile --tag dotnet-api:$(date +%s)
+      run: docker build $GITHUB_WORKSPACE/ET.WebAPI/ET.WebAPI.Api/ --file Dockerfile --tag dotnet-api:$(date +%s)
         
     - name: Restore dependencies
       run: dotnet restore
