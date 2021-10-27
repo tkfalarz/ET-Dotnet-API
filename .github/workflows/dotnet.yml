@@ -37,4 +37,4 @@ jobs:
     - name: Test
       run: dotnet test --no-build --verbosity normal
       env:
-        ApiDb: "Server=localhost;Uid=sa;Password=test;Persist Security Info=True;
+        ApiDb: "Server=localhost;Uid=sa;Password=test;Persist Security Info=True;"
