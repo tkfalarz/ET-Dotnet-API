@@ -24,19 +24,11 @@ jobs:
       
     - name: Build
       run: dotnet build --no-restore
-
-    - name: Run MsSQL server 
-      uses: actions/checkout@v2 # Required to mount the Github Workspace to a volume 
-    - uses: addnab/docker-run-action@v3
+      
+    - name: Run MsSQL Server
+      uses: isbang/compose-action@v1.0.0
       with:
-        username: sa
-        password: test
-        registry: mcr.microsoft.com/mssql
-        image: server:2019-latest
-        options: -v ${{ github.workspace }}:/work -e ABC=123
-        run: |
-          echo "Running Script"
-          /work/run-script
+        compose-file: ./docker-compose.integration-tests.yml
         
     - name: Test
       run: dotnet test --no-build --verbosity normal
