@@ -29,4 +29,4 @@ jobs:
         compose-file: ET.WebAPI.Api/docker-compose.integration-tests.yml
         
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test --no-build --verbosity diagnostic
