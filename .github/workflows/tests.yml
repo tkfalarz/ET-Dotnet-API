@@ -1,8 +1,6 @@
-name: '.NET Unit and Integration Testing'
+name: .NET Unit and Integration Testing
 
 on:
-  push:
-    branches: [ main ]
   pull_request:
     branches: [ main ]
 
