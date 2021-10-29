@@ -28,7 +28,7 @@ jobs:
     - name: Run MsSQL Server
       uses: isbang/compose-action@v1.0.0
       with:
-        compose-file: docker-compose.integration-tests.yml
+        compose-file: ET.WebAPI.Api/docker-compose.integration-tests.yml
         
     - name: Test
       run: dotnet test --no-build --verbosity normal
