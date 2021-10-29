@@ -1,0 +1,34 @@
+name: '.NET Unit and Integration Testing'
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  Tests:
+    runs-on: ubuntu-latest
+    env:
+      ENVIRONMENT: Development
+      GITHUB_WORKFLOW_CONNECTION_STRING: "Data Source=localhost;Uid=sa;Password=MSSQL_SA_PASSWORD=1StrongPwd!!;Persist Security Info=True;"
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+        
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Build
+      run: dotnet build --no-restore
+      
+    - name: Run MsSQL Server
+      uses: isbang/compose-action@v1.0.0
+      with:
+        compose-file: ET.WebAPI.Api/docker-compose.integration-tests.yml
+        
+    - name: Test
+      run: dotnet test --no-build --verbosity normal

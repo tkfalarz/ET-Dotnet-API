@@ -25,10 +25,7 @@ namespace ET.WebApi.DatabaseAccess.Tests.Integration.Utilities
             
             var connectionStringBuilder = new SqlConnectionStringBuilder()
             {
-                ConnectionString = new ConfigurationBuilder()
-                    .AddJsonFile($"testSettings.json", optional: false)
-                    .Build()
-                    .GetConnectionString("ApiDb"),
+                ConnectionString = GetConnectionString(),
                 InitialCatalog = databaseInitialCatalogName
             };
 
@@ -44,9 +41,24 @@ namespace ET.WebApi.DatabaseAccess.Tests.Integration.Utilities
             return creator.Context;
         }
 
-        public void Dispose()
+        public void Dispose() => Context?.Database?.EnsureDeletedAsync();
+
+        private string GetConnectionString()
         {
-            Context?.Database?.EnsureDeletedAsync();
+            var connectionString = Environment.GetEnvironmentVariable("GITHUB_WORKFLOW_CONNECTION_STRING");
+            if (string.IsNullOrWhiteSpace(connectionString))
+                connectionString = new DbConnectionStringBuilder()
+                {
+                    ["Data Source"] = (object)"localhost",
+                    ["Integrated Security"] = (object)"True",
+                    ["Connect Timeout"] = (object)"30",
+                    ["Encrypt"] = (object)"False",
+                    ["TrustServerCertificate"] = (object)"False",
+                    ["ApplicationIntent"] = (object)"ReadWrite",
+                    ["MultiSubnetFailover"] = (object)"False"
+                }.ConnectionString;
+
+            return connectionString;
         }
     }
 }

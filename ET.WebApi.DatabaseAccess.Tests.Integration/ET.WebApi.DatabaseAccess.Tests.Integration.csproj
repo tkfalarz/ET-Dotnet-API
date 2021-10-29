@@ -16,16 +16,6 @@
     </ItemGroup>
     
     <ItemGroup>
-        <Content Include="testSettings.json">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Content>
-    </ItemGroup>
-
-    <ItemGroup>
-        <None Remove="testSettings.json" />
-    </ItemGroup>
-    
-    <ItemGroup>
       <ProjectReference Include="..\ET.WebAPI.DatabaseAccess\ET.WebAPI.DatabaseAccess.csproj" />
     </ItemGroup>
 
