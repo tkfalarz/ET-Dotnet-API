@@ -24,7 +24,6 @@ namespace ET.WebApi.DatabaseAccess.Tests.Integration
         public async Task AfterAll()
         {
             await context?.Database?.EnsureDeletedAsync();
-            // await Database.DisposeAsync();
         }
     }
 }
