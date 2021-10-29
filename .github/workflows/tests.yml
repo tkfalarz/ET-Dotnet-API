@@ -25,11 +25,18 @@ jobs:
     - name: Build
       run: dotnet build --no-restore
 
-    - name: Start SqlServer
-      uses: 280780363/sqlserver-action@v1.0
+    - name: Run MsSQL server 
+      uses: actions/checkout@v2 # Required to mount the Github Workspace to a volume 
+    - uses: addnab/docker-run-action@v3
       with:
-        accept eula: Y
-        sa password: test
+        username: sa
+        password: test
+        registry: mcr.microsoft.com/mssql
+        image: server:2019-latest
+        options: -v ${{ github.workspace }}:/work -e ABC=123
+        run: |
+          echo "Running Script"
+          /work/run-script
         
     - name: Test
       run: dotnet test --no-build --verbosity normal
