@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       ENVIRONMENT: Development
-      GITHUB_WORKFLOW_CONNECTION_STRING: "Data Source=localhost;Uid=sa;Password=test;Persist Security Info=True;"
+      GITHUB_WORKFLOW_CONNECTION_STRING: "Data Source=localhost;Uid=sa;Password=MSSQL_SA_PASSWORD=1StrongPwd!!;Persist Security Info=True;"
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET
