@@ -1,8 +1,6 @@
-name: '.NET Unit and Integration Testing'
+name: .NET Unit and Integration Testing
 
 on:
-  push:
-    branches: [ main ]
   pull_request:
     branches: [ main ]
 
@@ -11,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       ENVIRONMENT: Development
-      GITHUB_WORKFLOW_CONNECTION_STRING: "Data Source=localhost;Uid=sa;Password=MSSQL_SA_PASSWORD=1StrongPwd!!;Persist Security Info=True;"
+      GITHUB_WORKFLOW_CONNECTION_STRING: "Data Source=localhost;Uid=sa;Password=MSSQL(!)OnDocker;Persist Security Info=True;"
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET
@@ -31,4 +29,4 @@ jobs:
         compose-file: ET.WebAPI.Api/docker-compose.integration-tests.yml
         
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test --no-build --verbosity minimal
