@@ -5,7 +5,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\ET.WebAPI.Database\ET.WebAPI.Database.csproj" />
+      <PackageReference Include="Microsoft.Data.SqlClient" Version="2.0.1" />
     </ItemGroup>
 
 </Project>

@@ -1,5 +1,5 @@
-using ET.WebAPI.DatabaseAccess.DatabaseSetup;
-using ET.WebAPI.DatabaseAccess.Entities;
+using ET.WebAPI.Database;
+using ET.WebAPI.Database.Entities;
 using ET.WebAPI.Kernel;
 using ET.WebAPI.Kernel.DomainModels;
 using ET.WebAPI.Kernel.DomainServices;

@@ -4,9 +4,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ET.WebAPI.Kernel", "ET.WebA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ET.WebAPI.Kernel.Tests.Unit", "ET.WebAPI.Kernel.Tests.Unit\ET.WebAPI.Kernel.Tests.Unit.csproj", "{91835CFF-8D02-417F-B829-29EBAC2DAA04}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ET.WebAPI.DatabaseAccess", "ET.WebAPI.DatabaseAccess\ET.WebAPI.DatabaseAccess.csproj", "{772340B8-A17E-4C36-A31A-C4CF3CBE00F1}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ET.WebApi.DatabaseAccess.Tests.Integration", "ET.WebApi.DatabaseAccess.Tests.Integration\ET.WebApi.DatabaseAccess.Tests.Integration.csproj", "{61810CA9-3812-4592-8B8B-D402CDA2AC48}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ET.WebApi.Database.Tests.Integration", "ET.WebApi.Database.Tests.Integration\ET.WebApi.Database.Tests.Integration.csproj", "{61810CA9-3812-4592-8B8B-D402CDA2AC48}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ET.WebAPI.BusinessLogic", "ET.WebAPI.BusinessLogic\ET.WebAPI.BusinessLogic.csproj", "{11D04122-072B-40FC-AAD4-B7D6CB1183A7}"
 EndProject
@@ -15,6 +13,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ET.WebAPI.Api", "ET.WebAPI.Api\ET.WebAPI.Api.csproj", "{F49B3F00-0676-4354-A4DA-31335627B9B7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ET.WebAPI.Api.Tests.Unit", "ET.WebAPI.Api.Tests.Unit\ET.WebAPI.Api.Tests.Unit.csproj", "{AFB062D7-514A-48B1-A79A-9E6FBCC3BF11}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ET.WebAPI.Api.Tests.Integration", "ET.WebAPI.Api.Tests.Integration\ET.WebAPI.Api.Tests.Integration.csproj", "{A0C963A1-0EF9-475B-9F28-997970D825D6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ET.WebAPI.TestsUtilities", "ET.WebAPI.TestsUtilities\ET.WebAPI.TestsUtilities.csproj", "{983E91C3-93A9-49AC-81F8-D2DFA29FF8D1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ET.WebAPI.Database", "ET.WebAPI.Database\ET.WebAPI.Database.csproj", "{0D34CAAE-73BA-408E-9064-F3F6FE2820C5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -62,10 +66,6 @@ Global
 		{91835CFF-8D02-417F-B829-29EBAC2DAA04}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{91835CFF-8D02-417F-B829-29EBAC2DAA04}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{91835CFF-8D02-417F-B829-29EBAC2DAA04}.Release|Any CPU.Build.0 = Release|Any CPU
-		{772340B8-A17E-4C36-A31A-C4CF3CBE00F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{772340B8-A17E-4C36-A31A-C4CF3CBE00F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{772340B8-A17E-4C36-A31A-C4CF3CBE00F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{772340B8-A17E-4C36-A31A-C4CF3CBE00F1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{61810CA9-3812-4592-8B8B-D402CDA2AC48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{61810CA9-3812-4592-8B8B-D402CDA2AC48}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{61810CA9-3812-4592-8B8B-D402CDA2AC48}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -86,5 +86,17 @@ Global
 		{AFB062D7-514A-48B1-A79A-9E6FBCC3BF11}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AFB062D7-514A-48B1-A79A-9E6FBCC3BF11}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AFB062D7-514A-48B1-A79A-9E6FBCC3BF11}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A0C963A1-0EF9-475B-9F28-997970D825D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0C963A1-0EF9-475B-9F28-997970D825D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0C963A1-0EF9-475B-9F28-997970D825D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A0C963A1-0EF9-475B-9F28-997970D825D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{983E91C3-93A9-49AC-81F8-D2DFA29FF8D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{983E91C3-93A9-49AC-81F8-D2DFA29FF8D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{983E91C3-93A9-49AC-81F8-D2DFA29FF8D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{983E91C3-93A9-49AC-81F8-D2DFA29FF8D1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D34CAAE-73BA-408E-9064-F3F6FE2820C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D34CAAE-73BA-408E-9064-F3F6FE2820C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D34CAAE-73BA-408E-9064-F3F6FE2820C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D34CAAE-73BA-408E-9064-F3F6FE2820C5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

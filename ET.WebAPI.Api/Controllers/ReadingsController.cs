@@ -1,7 +1,6 @@
 using ET.WebAPI.Api.Extensions;
 using ET.WebAPI.Api.Views;
-using ET.WebAPI.DatabaseAccess.DatabaseSetup;
-using ET.WebAPI.DatabaseAccess.Entities;
+using ET.WebAPI.Database.Entities;
 using ET.WebAPI.Kernel.DomainModels;
 using ET.WebAPI.Kernel.DomainServices;
 using Microsoft.AspNetCore.Authorization;

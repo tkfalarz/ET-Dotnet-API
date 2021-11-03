@@ -1,6 +1,6 @@
 using ET.WebAPI.BusinessLogic.Services;
-using ET.WebAPI.DatabaseAccess.DatabaseSetup;
-using ET.WebAPI.DatabaseAccess.Repositories;
+using ET.WebAPI.Database;
+using ET.WebAPI.Database.Repositories;
 using ET.WebAPI.Kernel.DomainServices;
 using ET.WebAPI.Kernel.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -32,7 +32,9 @@ namespace ET.WebAPI.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContextFactory<ApiDbContext>();
+            services.AddDbContext<ApiDbContext>(
+                opts =>
+                    opts.UseSqlServer(Configuration[ServiceEnvironmentVariablesNames.SqlConnectionString]));
             services.AddLogging();
             services.AddControllers();
             services.AddServices();

@@ -1,5 +1,5 @@
 using ET.WebAPI.BusinessLogic.Services;
-using ET.WebAPI.DatabaseAccess.Repositories;
+using ET.WebAPI.Database.Repositories;
 using ET.WebAPI.Kernel.DomainServices;
 using ET.WebAPI.Kernel.Repositories;
 using Microsoft.Extensions.DependencyInjection;
