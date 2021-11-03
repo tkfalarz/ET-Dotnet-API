@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       ENVIRONMENT: Development
-      GITHUB_WORKFLOW_CONNECTION_STRING: "Data Source=localhost;Uid=sa;Password=MSSQL(!)OnDocker;Persist Security Info=True;"
+      SQL_CONNECTION_STRING: "Data Source=localhost;Uid=sa;Password=MSSQL(!)OnDocker;Persist Security Info=True;"
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET
