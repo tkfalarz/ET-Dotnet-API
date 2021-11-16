@@ -8,7 +8,7 @@ namespace ET.WebAPI.TestsUtilities
     {
         public static string GetConnectionString(string initialCatalogName)
         {
-            var connectionStringBuilder = new SqlConnectionStringBuilder()
+            var connectionStringBuilder = new SqlConnectionStringBuilder
             {
                 ConnectionString = GetConnectionString(),
                 InitialCatalog = initialCatalogName
@@ -20,15 +20,15 @@ namespace ET.WebAPI.TestsUtilities
         {
             var connectionString = Environment.GetEnvironmentVariable("SQL_CONNECTION_STRING");
             if (string.IsNullOrWhiteSpace(connectionString))
-                connectionString = new DbConnectionStringBuilder()
+                connectionString = new DbConnectionStringBuilder
                 {
-                    ["Data Source"] = (object)"localhost",
-                    ["Integrated Security"] = (object)"True",
-                    ["Connect Timeout"] = (object)"30",
-                    ["Encrypt"] = (object)"False",
-                    ["TrustServerCertificate"] = (object)"False",
-                    ["ApplicationIntent"] = (object)"ReadWrite",
-                    ["MultiSubnetFailover"] = (object)"False"
+                    ["Data Source"] = "localhost",
+                    ["Integrated Security"] = "True",
+                    ["Connect Timeout"] = "30",
+                    ["Encrypt"] = "False",
+                    ["TrustServerCertificate"] = "False",
+                    ["ApplicationIntent"] = "ReadWrite",
+                    ["MultiSubnetFailover"] = "False"
                 }.ConnectionString;
 
             return connectionString;

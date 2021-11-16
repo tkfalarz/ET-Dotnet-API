@@ -1,13 +1,12 @@
 using ET.WebAPI.Kernel.DomainModels;
-using ET.WebAPI.Kernel.ErrorsHandling;
-using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ET.WebAPI.Kernel.Repositories
 {
     public interface IDevicesRepository
     {
-        Task<OperationResult<Guid>> GetDeviceIdAsync(string deviceName);
+        IQueryable<Device> GetDevices();
         Task StoreDeviceAsync(Device device);
     }
 }

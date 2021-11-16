@@ -1,16 +1,12 @@
-using ET.WebAPI.Database;
-using ET.WebAPI.Database.Entities;
-using ET.WebAPI.Kernel;
 using ET.WebAPI.Kernel.DomainModels;
 using ET.WebAPI.Kernel.DomainServices;
 using ET.WebAPI.Kernel.ErrorsHandling;
 using ET.WebAPI.Kernel.Repositories;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Device = ET.WebAPI.Kernel.DomainModels.Device;
 
 namespace ET.WebAPI.BusinessLogic.Services
 {
@@ -27,26 +23,29 @@ namespace ET.WebAPI.BusinessLogic.Services
             this.devicesRepository = devicesRepository;
         }
 
-        public async Task<OperationResult> StoreWeatherReadingAsync(DeviceReading deviceReading)
+        public async Task<OperationResult> StoreWeatherReadingAsync(Reading reading)
         {
-            if (deviceReading == null) throw new ArgumentNullException(nameof(deviceReading));
+            if (reading == null) throw new ArgumentNullException(nameof(reading));
 
-            var deviceIdGetOperationResult = await devicesRepository.GetDeviceIdAsync(deviceReading.DeviceName);
-            if (deviceIdGetOperationResult.IsFailure)
-                return OperationResult.Failure(deviceIdGetOperationResult.ErrorMessage, deviceIdGetOperationResult.ErrorType);
+            var deviceId = devicesRepository
+                .GetDevices()
+                .Where(x=>x.DeviceName == reading.DeviceName)
+                .Select(x=>x.DeviceId).FirstOrDefault();
+            if (deviceId == default)
+                return OperationResult.Failure($"Device {reading.DeviceName} not found", ErrorType.BusinessLogic);
 
-            var weatherReading = new WeatherReading
+            var weatherReading = new Reading
             {
-                Humidity = deviceReading.Humidity,
-                Pressure = deviceReading.Pressure,
-                Temperature = deviceReading.Temperature,
-                Timestamp = deviceReading.Timestamp,
-                AirQualityIndex = deviceReading.AirQualityIndex
+                Humidity = reading.Humidity,
+                Pressure = reading.Pressure,
+                Temperature = reading.Temperature,
+                Timestamp = reading.Timestamp,
+                AirQualityIndex = reading.AirQualityIndex
             };
 
             try
             {
-                await readingsRepository.StoreWeatherFactorsAsync(weatherReading, deviceIdGetOperationResult.Value);
+                await readingsRepository.StoreWeatherFactorsAsync(weatherReading, deviceId);
             }
             catch (DbUpdateException exception)
             {
@@ -54,6 +53,75 @@ namespace ET.WebAPI.BusinessLogic.Services
             }
             
             return OperationResult.Proceeded();
+        }
+
+        public async Task<Reading> GetNearestLatestReadingAsync(decimal latitude, decimal longitude)
+        {
+            var devices = devicesRepository.GetDevices().ToArray();
+            var devicesDistances = new SortedSet<(double distanceFromUserLocation, string deviceName)>();
+            var result = (Reading)default;
+            
+            foreach (var device in devices)
+            {
+                var coordsDistance = GetCoordsDistance(latitude, longitude, device.Latitude, device.Longitude);
+                devicesDistances.Add((coordsDistance, device.DeviceName));
+            }
+
+            if (devicesDistances.Any())
+            {
+                var queryable = (await readingsRepository.GetDeviceReadingsAsync()).OrderByDescending(x=>x.Timestamp);
+                
+                foreach (var (distance, deviceName) in devicesDistances)
+                {
+                    var filtered = queryable.Where(x=>x.DeviceName==deviceName).Take(1);
+                    if (filtered.Any())
+                    {
+                        result = filtered.First();
+                        break;
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        public async Task<List<Reading>> GetLatestReadingsAsync()
+        {
+            var devicesNames = devicesRepository.GetDevices().Select(x=>x.DeviceName).ToArray();
+            var readings = new List<Reading>();
+
+            if (devicesNames.Any())
+            {
+                var orderedSensorReadingsQuery = (await readingsRepository.GetDeviceReadingsAsync())
+                    .OrderByDescending(x => x.Timestamp);
+                
+                foreach (var deviceName in devicesNames)
+                {
+                    var res = orderedSensorReadingsQuery
+                        .Where(x => x.DeviceName == deviceName)
+                        .Take(1)
+                        .ToArray();
+                
+                    readings.AddRange(res);
+                }
+            }
+
+            return readings;
+        }
+
+        public async Task<Reading[]> GetDeviceReadingsAsync(string deviceName)
+        {
+            var readings = await readingsRepository.GetDeviceReadingsAsync();
+            return readings.Where(x => x.DeviceName == deviceName).ToArray();
+        }
+
+        private double GetCoordsDistance(decimal latitude, decimal longitude, decimal deviceLatitude, decimal deviceLongitude)
+        {
+            var xDiff = Math.Pow((double)latitude - (double)deviceLatitude, 2);
+            var yDiff = Math.Pow((double)longitude - (double)deviceLongitude, 2);
+
+            var result = Math.Abs(Math.Sqrt(xDiff + yDiff));
+            return result;
         }
     }
 }

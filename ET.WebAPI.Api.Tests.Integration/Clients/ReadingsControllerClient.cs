@@ -2,16 +2,11 @@ using ET.WebAPI.Api.Tests.Integration.Auth;
 using ET.WebAPI.Api.Views;
 using ET.WebAPI.Database;
 using ET.WebAPI.TestsUtilities;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
-using System;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
@@ -48,8 +43,17 @@ namespace ET.WebAPI.Api.Tests.Integration.Clients
                 .CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
         }
 
-        public async Task<HttpResponseMessage> StoreReadingAsync(DeviceReadingView content)
-            => await HttpClient.PostAsync(new Uri(ReadingsBaseUrl, UriKind.Relative), JsonContent.Create(content));
+        public async Task<HttpResponseMessage> StoreReadingAsync(ReadingView content) 
+            => await HttpClient.PostAsync(ReadingsBaseUrl, JsonContent.Create(content));
+
+        public async Task<HttpResponseMessage> GetNearestLatestReadingAsync(decimal latitude, decimal longitude) 
+            => await HttpClient.GetAsync($"{ReadingsBaseUrl}/latest?latitude={latitude}&longitude={longitude}");
+
+        public async Task<HttpResponseMessage> GetLatestReadingsAsync() 
+            => await HttpClient.GetAsync($"{ReadingsBaseUrl}/latest/allDevices");
+
+        public async Task<HttpResponseMessage> GetDeviceReadingsAsync(string deviceName) 
+            => await HttpClient.GetAsync($"{ReadingsBaseUrl}/{deviceName}");
 
         private string ConnectionString => TestDbConnectionStringProvider.GetConnectionString($"{nameof(ReadingsControllerClient)}-WebApiTests");
     }

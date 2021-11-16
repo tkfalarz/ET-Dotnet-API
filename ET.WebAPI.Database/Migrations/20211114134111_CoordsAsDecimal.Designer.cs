@@ -4,14 +4,16 @@ using ET.WebAPI.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ET.WebAPI.Database.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    partial class ApiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211114134111_CoordsAsDecimal")]
+    partial class CoordsAsDecimal
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -44,13 +46,11 @@ namespace ET.WebAPI.Database.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<decimal>("Latitude")
-                        .HasPrecision(8, 5)
-                        .HasColumnType("decimal(8,5)");
+                    b.Property<double>("Latitude")
+                        .HasColumnType("float");
 
-                    b.Property<decimal>("Longitude")
-                        .HasPrecision(9, 5)
-                        .HasColumnType("decimal(9,5)");
+                    b.Property<double>("Longitude")
+                        .HasColumnType("float");
 
                     b.Property<string>("Name")
                         .HasMaxLength(50)

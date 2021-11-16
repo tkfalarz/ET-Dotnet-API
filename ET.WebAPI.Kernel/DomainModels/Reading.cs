@@ -1,10 +1,8 @@
 using System;
-using System.ComponentModel.DataAnnotations;
-using System.Runtime.Serialization;
 
 namespace ET.WebAPI.Kernel.DomainModels
 {
-    public record DeviceReading
+    public record Reading
     {
         public string DeviceName { get; set; }
         public DateTimeOffset Timestamp { get; init; }

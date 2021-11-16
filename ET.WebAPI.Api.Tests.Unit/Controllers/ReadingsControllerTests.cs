@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -33,7 +34,7 @@ namespace ET.WebAPI.Api.Tests.Unit.Controllers
             var controller = new ReadingsController(readingsService, logger);
             controller.ModelState.AddModelError("error", "some error");
 
-            var result = await controller.StoreReadingAsync(new DeviceReadingView());
+            var result = await controller.StoreReadingAsync(new ReadingView());
 
             result.Should().BeOfType<BadRequestResult>();
         }
@@ -44,7 +45,7 @@ namespace ET.WebAPI.Api.Tests.Unit.Controllers
             var controller = new ReadingsController(readingsService, logger);
             controller.ModelState.AddModelError("error", "some error");
 
-            await controller.StoreReadingAsync(new DeviceReadingView());
+            await controller.StoreReadingAsync(new ReadingView());
 
             Mock.Get(logger).Verify(
                 m => m.Log(
@@ -62,11 +63,11 @@ namespace ET.WebAPI.Api.Tests.Unit.Controllers
         public async Task StoreReadingAsyncReturnsInternalServerErrorIfOperationFaulted()
         {
             Mock.Get(readingsService)
-                .Setup(x => x.StoreWeatherReadingAsync(It.IsAny<DeviceReading>()))
+                .Setup(x => x.StoreWeatherReadingAsync(It.IsAny<Reading>()))
                 .ReturnsAsync(OperationResult.Failure("some error", ErrorType.Entity));
             var controller = new ReadingsController(readingsService, logger);
 
-            var result = await controller.StoreReadingAsync(new DeviceReadingView());
+            var result = await controller.StoreReadingAsync(new ReadingView());
 
             result.Should().BeEquivalentTo(new StatusCodeResult((int)HttpStatusCode.InternalServerError));
         }
@@ -75,13 +76,97 @@ namespace ET.WebAPI.Api.Tests.Unit.Controllers
         public async Task StoreReadingAsyncReturnsAcceptedIfOperationCompletedSuccessfully()
         {
             Mock.Get(readingsService)
-                .Setup(x => x.StoreWeatherReadingAsync(It.IsAny<DeviceReading>()))
+                .Setup(x => x.StoreWeatherReadingAsync(It.IsAny<Reading>()))
                 .ReturnsAsync(OperationResult.Proceeded);
             var controller = new ReadingsController(readingsService, logger);
 
-            var result = await controller.StoreReadingAsync(new DeviceReadingView());
+            var result = await controller.StoreReadingAsync(new ReadingView());
 
             result.Should().BeOfType<AcceptedResult>();
+        }
+
+        [Test]
+        public async Task GetLatestReadingsAsyncReturnsOkObjectResultIfSucceeded()
+        {
+            Mock.Get(readingsService)
+                .Setup(x => x.GetLatestReadingsAsync())
+                .ReturnsAsync(new List<Reading> { new() });
+            var controller = new ReadingsController(readingsService, logger);
+
+            var result = await controller.GetDevicesLatestReadingsAsync();
+
+            result.Should().BeOfType<OkObjectResult>().Which.Value.Should().BeOfType<ReadingView[]>();
+        }
+
+        [Test]
+        public async Task GetLatestReadingsAsyncReturnsNotFoundResult()
+        {
+            Mock.Get(readingsService)
+                .Setup(x => x.GetLatestReadingsAsync())
+                .ReturnsAsync(new List<Reading>());
+            var controller = new ReadingsController(readingsService, logger);
+            
+            var result = await controller.GetDevicesLatestReadingsAsync();
+            
+            result.Should().BeOfType<NotFoundResult>();
+        }
+
+        [Test]
+        public async Task GetNearestLatestReadingAsyncReturnsOkObjectResultIfSucceeded()
+        {
+            const decimal lat = 222;
+            const decimal lon = 333;
+            Mock.Get(readingsService)
+                .Setup(x => x.GetNearestLatestReadingAsync(lat,lon))
+                .ReturnsAsync(new Reading());
+            var controller = new ReadingsController(readingsService, logger);
+
+            var result = await controller.GetNearestLatestReadingAsync(lat, lon);
+
+            result.Should().BeOfType<OkObjectResult>().Which.Value.Should().BeOfType<ReadingView>();
+        }
+
+        [Test]
+        public async Task GetNearestLatestReadingAsyncReturnsNotFoundResult()
+        {
+            const decimal lat = 222;
+            const decimal lon = 333;
+            Mock.Get(readingsService)
+                .Setup(x => x.GetNearestLatestReadingAsync(lat, lon))
+                .ReturnsAsync((Reading)null);
+            var controller = new ReadingsController(readingsService, logger);
+
+            var result = await controller.GetNearestLatestReadingAsync(lat, lon);
+
+            result.Should().BeOfType<NotFoundResult>();
+        }
+
+        [Test]
+        public async Task GetDeviceReadingsAsyncReturnsNotFoundResult()
+        {
+            Mock.Get(readingsService)
+                .Setup(x => x.GetDeviceReadingsAsync(It.IsAny<string>()))
+                .ReturnsAsync(Array.Empty<Reading>());
+            var controller = new ReadingsController(readingsService, logger);
+
+            var result = await controller.GetDeviceReadingsAsync("Device1");
+
+            result.Should().BeOfType<NotFoundResult>();
+        }
+
+        [Test]
+        public async Task GetDeviceReadingsAsyncReturnsOkObjectResult()
+        {
+            const string deviceName = "Device1";
+            var expectedResult = new[] { new ReadingView() };
+            Mock.Get(readingsService)
+                .Setup(x => x.GetDeviceReadingsAsync(deviceName))
+                .ReturnsAsync(new [] { new Reading() });
+            var controller = new ReadingsController(readingsService, logger);
+
+            var result = await controller.GetDeviceReadingsAsync(deviceName);
+
+            result.Should().BeOfType<OkObjectResult>().Which.Value.Should().BeEquivalentTo(expectedResult);
         }
     }
 }

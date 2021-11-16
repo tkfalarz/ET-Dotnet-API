@@ -25,15 +25,15 @@ namespace ET.WebAPI.Api.Tests.Unit.Extensions
             {
                 DeviceName = "Device1",
                 SensorName = "Sensor1",
-                Latitude = "Latitude1",
-                Longitude = "Longitude1"
+                Latitude = 11.1111m,
+                Longitude = 22.2222m
             };
             var expectedResult = new Device
             {
                 DeviceName = "Device1",
                 SensorName = "Sensor1",
-                Latitude = "Latitude1",
-                Longitude = "Longitude1"
+                Latitude = 11.1111m,
+                Longitude = 22.2222m
             };
 
             var result = view.ToModel();
