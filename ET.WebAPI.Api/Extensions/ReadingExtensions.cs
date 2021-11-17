@@ -4,14 +4,14 @@ using System;
 
 namespace ET.WebAPI.Api.Extensions
 {
-    public static class DeviceReadingExtensions
+    public static class ReadingExtensions
     {
-        public static DeviceReading ToModel(this DeviceReadingView view)
+        public static Reading ToModel(this ReadingView view)
         {
             if (view == null)
                 throw new ArgumentNullException(nameof(view));
 
-            return new DeviceReading
+            return new Reading
             {
                 Humidity = view.Humidity,
                 Pressure = view.Pressure,

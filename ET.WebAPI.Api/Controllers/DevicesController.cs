@@ -4,11 +4,11 @@ using ET.WebAPI.Kernel.DomainServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace ET.WebAPI.Api.Controllers
 {
@@ -27,6 +27,10 @@ namespace ET.WebAPI.Api.Controllers
 
         [HttpPost]
         [Authorize]
+        [SwaggerResponse((int)HttpStatusCode.Accepted)]
+        [SwaggerResponse((int)HttpStatusCode.BadRequest)]
+        [SwaggerResponse((int)HttpStatusCode.InternalServerError)]
+        [SwaggerResponse((int)HttpStatusCode.Unauthorized)]
         public async Task<IActionResult> StoreDeviceAsync([FromBody, Required] DeviceView reading)
         {
             if (!ModelState.IsValid)

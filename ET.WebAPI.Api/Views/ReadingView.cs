@@ -5,12 +5,14 @@ using System.Runtime.Serialization;
 namespace ET.WebAPI.Api.Views
 {
     [DataContract]
-    public class DeviceReadingView
+    public class ReadingView
     {
         [DataMember, Required]
-        public DateTimeOffset Timestamp { get; init; }
-        [DataMember, Required]
         public string DeviceName { get; set; }
+
+        [DataMember, Required]
+        public DateTimeOffset Timestamp { get; init; }
+
         [DataMember, Required]
         public double AirQualityIndex { get; init; }
         [DataMember, Required]

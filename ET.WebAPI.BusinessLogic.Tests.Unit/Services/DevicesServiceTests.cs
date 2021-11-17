@@ -4,7 +4,6 @@ using ET.WebAPI.Kernel.ErrorsHandling;
 using ET.WebAPI.Kernel.Repositories;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using Moq;
 using NUnit.Framework;
 using System;
@@ -60,8 +59,8 @@ namespace ET.WebAPI.BusinessLogic.Tests.Unit.Services
         {
             var sampleDevice = new Device
             {
-                Latitude = "latitude",
-                Longitude = "longitude",
+                Latitude = 11.1111m,
+                Longitude = 22.2222m,
                 SensorName = "Dummy sensor",
                 DeviceName = "Dummy device"
             };

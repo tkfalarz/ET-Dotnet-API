@@ -10,10 +10,6 @@ namespace ET.WebApi.Database.Tests.Integration
     {
         private ApiDbContext context;
 
-        public DatabaseSetUpFixture()
-        {
-        }
-
         [OneTimeSetUp]
         public void BeforeAll()
         {

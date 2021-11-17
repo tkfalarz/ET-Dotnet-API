@@ -1,8 +1,5 @@
 using ET.WebAPI.Kernel.DomainModels;
-using ET.WebAPI.Kernel.ErrorsHandling;
 using ET.WebAPI.Kernel.Repositories;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,20 +14,6 @@ namespace ET.WebAPI.Database.Repositories
             this.dbContext = dbContext;
         }
 
-        public async Task<OperationResult<Guid>> GetDeviceIdAsync(string deviceName)
-        {
-            if (string.IsNullOrWhiteSpace(deviceName))
-                throw new ArgumentNullException(nameof(deviceName), "Device name cannot be null or empty");
-
-            var result = await dbContext.Devices.FirstOrDefaultAsync(x => x.Name == deviceName);
-            if (result == null)
-            {
-                return OperationResult<Guid>.Failure($"Device {deviceName} not found", ErrorType.Entity);
-            }
-
-            return OperationResult<Guid>.Proceeded(result.Id);
-        }
-        
         public async Task StoreDeviceAsync(Device device)
         {
             if (device == null)
@@ -46,6 +29,21 @@ namespace ET.WebAPI.Database.Repositories
                 });
 
             await dbContext.SaveChangesAsync();
+        }
+        
+        public IQueryable<Device> GetDevices()
+        {
+            var result = dbContext.Devices.Select(
+                x => new Device
+                {
+                    DeviceId = x.Id,
+                    Latitude = x.Latitude,
+                    Longitude = x.Longitude,
+                    DeviceName = x.Name,
+                    SensorName = x.SensorName
+                });
+
+            return result;
         }
     }
 }

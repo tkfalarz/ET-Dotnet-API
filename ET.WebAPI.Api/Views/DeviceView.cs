@@ -1,4 +1,3 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 
@@ -14,9 +13,9 @@ namespace ET.WebAPI.Api.Views
         public string SensorName { get; init; }
 
         [DataMember, Required]
-        public string Latitude { get; init; }
+        public decimal Latitude { get; init; }
 
         [DataMember, Required]
-        public string Longitude { get; init; }
+        public decimal Longitude { get; init; }
     }
 }

@@ -8,12 +8,12 @@ using System;
 namespace ET.WebAPI.Api.Tests.Unit.Extensions
 {
     [TestFixture]
-    public class DeviceReadingExtensionsTests
+    public class ReadingExtensionsTests
     {
         [Test]
         public void ThrowsArgumentNullExceptionIfViewIsNull()
         {
-            Action action = () => ((DeviceReadingView)null).ToModel();
+            Action action = () => ((ReadingView)null).ToModel();
 
             action.Should().Throw<ArgumentNullException>().Which.ParamName.Should().Be("view");
         }
@@ -22,7 +22,7 @@ namespace ET.WebAPI.Api.Tests.Unit.Extensions
         public void ToModelTest()
         {
             var dateTimeOffset = DateTimeOffset.Now;
-            var view = new DeviceReadingView
+            var view = new ReadingView
             {
                 Humidity = 2,
                 Pressure = 1,
@@ -31,7 +31,7 @@ namespace ET.WebAPI.Api.Tests.Unit.Extensions
                 Timestamp = dateTimeOffset,
                 DeviceName = "Dev1"
             };
-            var expectedModel = new DeviceReading
+            var expectedModel = new Reading
             {
                 Humidity = 2,
                 Pressure = 1,

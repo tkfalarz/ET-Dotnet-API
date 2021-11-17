@@ -1,11 +1,9 @@
 using ET.WebAPI.Api.Tests.Integration.Clients;
 using ET.WebAPI.Api.Views;
 using ET.WebAPI.Database;
-using ET.WebAPI.Database.Entities;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using NUnit.Framework;
-using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -40,8 +38,8 @@ namespace ET.WebAPI.Api.Tests.Integration.Tests
                 new DeviceView
                 {
                     DeviceName = DeviceName,
-                    Latitude = "Lat",
-                    Longitude = "Long",
+                    Latitude = 11.1111m,
+                    Longitude = 22.2222m,
                     SensorName = "Bme"
                 });
 

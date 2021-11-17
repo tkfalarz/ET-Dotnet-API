@@ -1,13 +1,13 @@
 using ET.WebAPI.Kernel.DomainModels;
-using ET.WebAPI.Kernel.ErrorsHandling;
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ET.WebAPI.Kernel.Repositories
 {
     public interface IReadingsRepository
     {
-        Task StoreWeatherFactorsAsync(WeatherReading weatherReading, Guid deviceId);
+        Task StoreWeatherFactorsAsync(Reading reading, Guid deviceId);
+        Task<IQueryable<Reading>> GetDeviceReadingsAsync();
     }
 }
