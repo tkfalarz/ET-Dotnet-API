@@ -2,9 +2,7 @@ using ET.WebAPI.Database;
 using ET.WebAPI.Database.Entities;
 using ET.WebApi.Database.Tests.Integration.Utilities;
 using FluentAssertions;
-using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
-using System;
 using System.Linq;
 
 namespace ET.WebApi.Database.Tests.Integration.Configuration

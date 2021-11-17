@@ -8,6 +8,6 @@ namespace ET.WebAPI.Kernel.Repositories
     public interface IReadingsRepository
     {
         Task StoreWeatherFactorsAsync(Reading reading, Guid deviceId);
-        Task<IQueryable<Reading>> GetDeviceReadingsAsync();
+        IQueryable<Reading> GetDeviceReadings();
     }
 }
