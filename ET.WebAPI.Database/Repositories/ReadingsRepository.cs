@@ -53,7 +53,7 @@ namespace ET.WebAPI.Database.Repositories
             await dbContext.SaveChangesAsync();
         }
 
-        public async Task<IQueryable<Reading>> GetDeviceReadingsAsync()
+        public IQueryable<Reading> GetDeviceReadings()
         {
             var query =
                 from a in dbContext.AqiReadings

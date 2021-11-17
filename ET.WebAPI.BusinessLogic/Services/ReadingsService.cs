@@ -27,10 +27,10 @@ namespace ET.WebAPI.BusinessLogic.Services
         {
             if (reading == null) throw new ArgumentNullException(nameof(reading));
 
-            var deviceId = devicesRepository
+            var deviceId = await devicesRepository
                 .GetDevices()
                 .Where(x=>x.DeviceName == reading.DeviceName)
-                .Select(x=>x.DeviceId).FirstOrDefault();
+                .Select(x=>x.DeviceId).FirstOrDefaultAsync();
             if (deviceId == default)
                 return OperationResult.Failure($"Device {reading.DeviceName} not found", ErrorType.BusinessLogic);
 
@@ -57,7 +57,7 @@ namespace ET.WebAPI.BusinessLogic.Services
 
         public async Task<Reading> GetNearestLatestReadingAsync(decimal latitude, decimal longitude)
         {
-            var devices = devicesRepository.GetDevices().ToArray();
+            var devices = await devicesRepository.GetDevices().ToArrayAsync();
             var devicesDistances = new SortedSet<(double distanceFromUserLocation, string deviceName)>();
             var result = (Reading)default;
             
@@ -69,7 +69,10 @@ namespace ET.WebAPI.BusinessLogic.Services
 
             if (devicesDistances.Any())
             {
-                var queryable = (await readingsRepository.GetDeviceReadingsAsync()).OrderByDescending(x=>x.Timestamp);
+                var queryable = await readingsRepository
+                    .GetDeviceReadings()
+                    .OrderByDescending(x=>x.Timestamp)
+                    .ToArrayAsync();
                 
                 foreach (var (distance, deviceName) in devicesDistances)
                 {
@@ -87,13 +90,15 @@ namespace ET.WebAPI.BusinessLogic.Services
 
         public async Task<List<Reading>> GetLatestReadingsAsync()
         {
-            var devicesNames = devicesRepository.GetDevices().Select(x=>x.DeviceName).ToArray();
+            var devicesNames = await devicesRepository.GetDevices().Select(x=>x.DeviceName).ToArrayAsync();
             var readings = new List<Reading>();
 
             if (devicesNames.Any())
             {
-                var orderedSensorReadingsQuery = (await readingsRepository.GetDeviceReadingsAsync())
-                    .OrderByDescending(x => x.Timestamp);
+                var orderedSensorReadingsQuery =  await readingsRepository
+                    .GetDeviceReadings()
+                    .OrderByDescending(x => x.Timestamp)
+                    .ToArrayAsync();
                 
                 foreach (var deviceName in devicesNames)
                 {
@@ -111,7 +116,7 @@ namespace ET.WebAPI.BusinessLogic.Services
 
         public async Task<Reading[]> GetDeviceReadingsAsync(string deviceName, int limit)
         {
-            var readings = await readingsRepository.GetDeviceReadingsAsync();
+            var readings = await readingsRepository.GetDeviceReadings().ToArrayAsync();
             var filteredByDeviceNameQuery = readings.Where(x => x.DeviceName == deviceName);
             return limit == 0
                 ? filteredByDeviceNameQuery.ToArray()

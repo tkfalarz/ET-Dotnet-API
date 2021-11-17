@@ -4,7 +4,6 @@ using ET.WebAPI.Database.Repositories;
 using ET.WebApi.Database.Tests.Integration.Utilities;
 using ET.WebAPI.Kernel.Repositories;
 using FluentAssertions;
-using Microsoft.EntityFrameworkCore.Query.Internal;
 using NUnit.Framework;
 using System;
 using System.Linq;
@@ -86,9 +85,7 @@ namespace ET.WebApi.Database.Tests.Integration.Repositories
         
             var result = repository.GetDevices();
 
-            result.Should()
-                .BeOfType<EntityQueryable<WebAPI.Kernel.DomainModels.Device>>().Which.ToArray()
-                .Should().BeEquivalentTo(expectedResult);
+            result.ToArray().Should().BeEquivalentTo(expectedResult);
         }
 
         [Test]

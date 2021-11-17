@@ -117,7 +117,7 @@ namespace ET.WebApi.Database.Tests.Integration.Repositories
         }
 
         [Test]
-        public async Task GetDeviceReadingsAsyncTest()
+        public void GetDeviceReadingsTest()
         { 
             var date1 = new DateTimeOffset(DateTime.Now);
             var date2 = new DateTimeOffset(DateTime.Now.AddMinutes(30));
@@ -153,15 +153,15 @@ namespace ET.WebApi.Database.Tests.Integration.Repositories
                 }
             };
 
-            var result = await repository.GetDeviceReadingsAsync();
+            var result = repository.GetDeviceReadings();
 
             result.Should().BeEquivalentTo(expectedResult.AsQueryable());
         }
 
         [Test]
-        public async Task GetDeviceReadingsAsyncTestEmptyCase()
+        public void GetDeviceReadingsEmptyCase()
         {
-            var result = await repository.GetDeviceReadingsAsync();
+            var result = repository.GetDeviceReadings();
 
             result.Should().BeEmpty();
         }
