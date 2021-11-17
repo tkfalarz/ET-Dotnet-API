@@ -145,7 +145,7 @@ namespace ET.WebAPI.Api.Tests.Unit.Controllers
         public async Task GetDeviceReadingsAsyncReturnsNotFoundResult()
         {
             Mock.Get(readingsService)
-                .Setup(x => x.GetDeviceReadingsAsync(It.IsAny<string>()))
+                .Setup(x => x.GetDeviceReadingsAsync(It.IsAny<string>(), It.IsAny<int>()))
                 .ReturnsAsync(Array.Empty<Reading>());
             var controller = new ReadingsController(readingsService, logger);
 
@@ -160,7 +160,7 @@ namespace ET.WebAPI.Api.Tests.Unit.Controllers
             const string deviceName = "Device1";
             var expectedResult = new[] { new ReadingView() };
             Mock.Get(readingsService)
-                .Setup(x => x.GetDeviceReadingsAsync(deviceName))
+                .Setup(x => x.GetDeviceReadingsAsync(deviceName, 0))
                 .ReturnsAsync(new [] { new Reading() });
             var controller = new ReadingsController(readingsService, logger);
 

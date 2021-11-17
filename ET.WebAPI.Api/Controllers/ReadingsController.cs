@@ -55,9 +55,9 @@ namespace ET.WebAPI.Api.Controllers
         [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(ReadingView[]))]
         [SwaggerResponse((int)HttpStatusCode.BadRequest)]
         [SwaggerResponse((int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> GetDeviceReadingsAsync([Required] string deviceName)
+        public async Task<IActionResult> GetDeviceReadingsAsync([Required] string deviceName, [FromQuery] int limit = 0)
         {
-            var result = await readingsService.GetDeviceReadingsAsync(deviceName);
+            var result = await readingsService.GetDeviceReadingsAsync(deviceName, limit);
             return result.Any()
                 ? Ok(result.Select(x => x.ToView()).ToArray())
                 : NotFound();

@@ -21,6 +21,7 @@ namespace ET.WebAPI.BusinessLogic.Tests.Unit.Services
         private const double SampleTemperature = 23;
         private const double SampleAqi = 24;
         private const string SampleErrorMessage = "some crap happened here...";
+        private const string DeviceName = "dev1";
         private static readonly DateTimeOffset SampleTimestamp = DateTimeOffset.Now;
 
         private IReadingsRepository readingsRepository;
@@ -46,14 +47,13 @@ namespace ET.WebAPI.BusinessLogic.Tests.Unit.Services
         [Test]
         public async Task StoreWeatherReadingAsyncReturnsOperationResultFailureIfDevicesRepositoryReturnsNoDevices()
         {
-            const string deviceName = "dev1";
-            var expectedResult = OperationResult.Failure($"Device {deviceName} not found", ErrorType.BusinessLogic);
+            var expectedResult = OperationResult.Failure($"Device {DeviceName} not found", ErrorType.BusinessLogic);
             Mock.Get(devicesRepository)
                 .Setup(x => x.GetDevices())
                 .Returns(Array.Empty<Device>().AsQueryable);
             var service = CreateService();
 
-            var result = await service.StoreWeatherReadingAsync(new Reading { DeviceName = deviceName });
+            var result = await service.StoreWeatherReadingAsync(new Reading { DeviceName = DeviceName });
 
             result.Should().BeOfType<OperationResult>().Which.Should().Be(expectedResult);
         }
@@ -177,7 +177,7 @@ namespace ET.WebAPI.BusinessLogic.Tests.Unit.Services
         {
             Mock.Get(devicesRepository)
                 .Setup(x => x.GetDevices())
-                .Returns(new[] { new Device { Latitude = 1222, Longitude = 1223, DeviceName = "Dev1", SensorName = "Sen1" } }.AsQueryable());
+                .Returns(new[] { new Device { Latitude = 1222, Longitude = 1223, DeviceName = DeviceName, SensorName = "Sen1" } }.AsQueryable());
             var service = CreateService();
             
             await service.GetNearestLatestReadingAsync(21.37m, 2005.2137m);
@@ -211,18 +211,18 @@ namespace ET.WebAPI.BusinessLogic.Tests.Unit.Services
         [Test]
         public async Task GetNearestLatestReadingAsyncReturnsReadingWithTheNearestDistanceToGivenCoords()
         {
-            var expectedResult = new Reading { DeviceName = "Dev1" };
+            var expectedResult = new Reading { DeviceName = DeviceName };
             var service = CreateService();
             Mock.Get(devicesRepository).Setup(x => x.GetDevices()).Returns(
                 new[]
                 {
-                    new Device { DeviceName = "Dev1", Latitude = 10, Longitude = 10 },
+                    new Device { DeviceName = DeviceName, Latitude = 10, Longitude = 10 },
                     new Device { DeviceName = "Dev2", Latitude = -11, Longitude = -11 }
                 }.AsQueryable());
             Mock.Get(readingsRepository).Setup(x => x.GetDeviceReadingsAsync()).ReturnsAsync(
                 new[]
                 {
-                    new Reading { DeviceName = "Dev1" },
+                    new Reading { DeviceName = DeviceName },
                     new Reading { DeviceName = "Dev2" }
                 }.AsQueryable);
 
@@ -236,7 +236,7 @@ namespace ET.WebAPI.BusinessLogic.Tests.Unit.Services
         {
             var service = CreateService();
 
-            await service.GetDeviceReadingsAsync("Device1");
+            await service.GetDeviceReadingsAsync("Device1", 0);
             
             Mock.Get(readingsRepository).Verify(x=>x.GetDeviceReadingsAsync(), Times.Once);
         }
@@ -246,7 +246,7 @@ namespace ET.WebAPI.BusinessLogic.Tests.Unit.Services
         {
             var service = CreateService();
 
-            var result = await service.GetDeviceReadingsAsync("Device1");
+            var result = await service.GetDeviceReadingsAsync("Device1", 0);
 
             result.Should().BeEmpty();
         }
@@ -256,9 +256,28 @@ namespace ET.WebAPI.BusinessLogic.Tests.Unit.Services
         {
             var service = CreateService();
 
-            var result = await service.GetDeviceReadingsAsync("Device1");
+            var result = await service.GetDeviceReadingsAsync("Device1", 0);
 
             result.Should().BeOfType<Reading[]>();
+        }
+
+        [Test]
+        public async Task GetDeviceReadingsAsyncReturnsLimitedArrayOfReadings()
+        {
+            var latestDate = DateTimeOffset.Now;
+            var previousDate = DateTimeOffset.Now.AddDays(-5);
+            var expectedResult = new[] { new Reading { Timestamp = latestDate, DeviceName = DeviceName } };
+            Mock.Get(readingsRepository).Setup(x => x.GetDeviceReadingsAsync()).ReturnsAsync(
+                new[]
+                {
+                    new Reading { Timestamp = latestDate, DeviceName = DeviceName },
+                    new Reading { Timestamp = previousDate, DeviceName = DeviceName }
+                }.AsQueryable);
+            var service = CreateService();
+
+            var result = await service.GetDeviceReadingsAsync(DeviceName, 1);
+
+            result.Should().BeEquivalentTo(expectedResult);
         }
         
         private ReadingsService CreateService() => new(readingsRepository, devicesRepository);

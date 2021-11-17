@@ -109,10 +109,13 @@ namespace ET.WebAPI.BusinessLogic.Services
             return readings;
         }
 
-        public async Task<Reading[]> GetDeviceReadingsAsync(string deviceName)
+        public async Task<Reading[]> GetDeviceReadingsAsync(string deviceName, int limit)
         {
             var readings = await readingsRepository.GetDeviceReadingsAsync();
-            return readings.Where(x => x.DeviceName == deviceName).ToArray();
+            var filteredByDeviceNameQuery = readings.Where(x => x.DeviceName == deviceName);
+            return limit == 0
+                ? filteredByDeviceNameQuery.ToArray()
+                : filteredByDeviceNameQuery.OrderByDescending(x => x.Timestamp).Take(limit).ToArray();
         }
 
         private double GetCoordsDistance(decimal latitude, decimal longitude, decimal deviceLatitude, decimal deviceLongitude)

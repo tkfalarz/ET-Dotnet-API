@@ -11,6 +11,6 @@ namespace ET.WebAPI.Kernel.DomainServices
 
         Task<Reading> GetNearestLatestReadingAsync(decimal latitude, decimal longitude);
         Task<List<Reading>> GetLatestReadingsAsync();
-        Task<Reading[]> GetDeviceReadingsAsync(string deviceName);
+        Task<Reading[]> GetDeviceReadingsAsync(string deviceName, int limit);
     }
 }
