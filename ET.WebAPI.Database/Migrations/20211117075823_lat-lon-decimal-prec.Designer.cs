@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ET.WebAPI.Database.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    [Migration("20211116105613_lat-lon-precision")]
-    partial class latlonprecision
+    [Migration("20211117075823_lat-lon-decimal-prec")]
+    partial class latlondecimalprec
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -47,12 +47,12 @@ namespace ET.WebAPI.Database.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal>("Latitude")
-                        .HasPrecision(8, 5)
-                        .HasColumnType("decimal(8,5)");
+                        .HasPrecision(7, 5)
+                        .HasColumnType("decimal(7,5)");
 
                     b.Property<decimal>("Longitude")
-                        .HasPrecision(9, 5)
-                        .HasColumnType("decimal(9,5)");
+                        .HasPrecision(8, 5)
+                        .HasColumnType("decimal(8,5)");
 
                     b.Property<string>("Name")
                         .HasMaxLength(50)
