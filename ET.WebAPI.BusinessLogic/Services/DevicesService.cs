@@ -4,7 +4,8 @@ using ET.WebAPI.Kernel.ErrorsHandling;
 using ET.WebAPI.Kernel.Repositories;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ET.WebAPI.BusinessLogic.Services
@@ -32,6 +33,21 @@ namespace ET.WebAPI.BusinessLogic.Services
             }
 
             return OperationResult.Proceeded();
+        }
+
+        public async Task<IReadOnlyList<Device>> GetDevicesAsync()
+        {
+            var devices = await devicesRepository.GetDevices().ToListAsync();
+            return devices;
+        }
+
+        public async Task<Device> GetDeviceAsync(string deviceName)
+        {
+            var device = await devicesRepository.GetDevices()
+                .Where(x => x.DeviceName == deviceName)
+                .Take(1)
+                .FirstOrDefaultAsync();
+            return device;
         }
     }
 }

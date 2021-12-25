@@ -6,19 +6,19 @@ namespace ET.WebAPI.Api.Extensions
 {
     public static class ReadingViewExtensions
     {
-        public static ReadingView ToView(this Reading model)
+        public static ReadingSet ToModel(this ReadingSetView setView)
         {
-            if (model == null)
-                throw new ArgumentNullException(nameof(model));
+            if (setView == null)
+                throw new ArgumentNullException(nameof(setView));
 
-            return new ReadingView
+            return new ReadingSet
             {
-                Humidity = model.Humidity,
-                Pressure = model.Pressure,
-                Temperature = model.Temperature,
-                Timestamp = model.Timestamp,
-                DeviceName = model.DeviceName,
-                AirQualityIndex = model.AirQualityIndex
+                Humidity = setView.Humidity,
+                Pressure = setView.Pressure,
+                Temperature = setView.Temperature,
+                Timestamp = setView.Timestamp,
+                AirQualityIndex = setView.AirQualityIndex,
+                DeviceName = setView.DeviceName
             };
         }
     }

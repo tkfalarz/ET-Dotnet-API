@@ -1,5 +1,4 @@
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 
 namespace ET.WebAPI.Api.Views
@@ -7,19 +6,10 @@ namespace ET.WebAPI.Api.Views
     [DataContract]
     public class ReadingView
     {
-        [DataMember, Required]
-        public string DeviceName { get; set; }
-
-        [DataMember, Required]
+        [DataMember]
         public DateTimeOffset Timestamp { get; init; }
-
-        [DataMember, Required]
-        public double AirQualityIndex { get; init; }
-        [DataMember, Required]
-        public double Pressure { get; set; }
-        [DataMember, Required]
-        public double Temperature { get; set; }
-        [DataMember, Required]
-        public double Humidity { get; set; }
+        
+        [DataMember]
+        public double Value { get; set; }
     }
 }

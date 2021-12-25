@@ -24,6 +24,8 @@ namespace ET.WebAPI.BusinessLogic.Tests.Unit.Services
         private const string SampleErrorMessage = "some crap happened here...";
         private const string DeviceName = "dev1";
         private static readonly DateTimeOffset SampleTimestamp = DateTimeOffset.Now;
+        private static readonly DateTimeOffset LatestDate = DateTimeOffset.Now;
+        private static readonly DateTimeOffset PreviousDate = DateTimeOffset.Now.AddDays(-5);
 
         private IReadingsRepository readingsRepository;
         private IDevicesRepository devicesRepository;
@@ -40,7 +42,7 @@ namespace ET.WebAPI.BusinessLogic.Tests.Unit.Services
             
             Mock.Get(readingsRepository)
                 .Setup(x => x.GetDeviceReadings())
-                .Returns(Array.Empty<Reading>().AsQueryable().BuildMock().Object);
+                .Returns(Array.Empty<ReadingSet>().AsQueryable().BuildMock().Object);
         }
 
         [Test]
@@ -48,7 +50,7 @@ namespace ET.WebAPI.BusinessLogic.Tests.Unit.Services
         {
             var service = CreateService();
 
-            Func<Task> action = async () => await service.StoreWeatherReadingAsync(null);
+            Func<Task> action = async () => await service.StoreReadingSetAsync(null);
 
             action.Should().ThrowAsync<ArgumentNullException>().WithParameterName("deviceReading");
         }
@@ -62,7 +64,7 @@ namespace ET.WebAPI.BusinessLogic.Tests.Unit.Services
                 .Returns(Array.Empty<Device>().AsQueryable().BuildMock().Object);
             var service = CreateService();
 
-            var result = await service.StoreWeatherReadingAsync(new Reading { DeviceName = DeviceName });
+            var result = await service.StoreReadingSetAsync(new ReadingSet { DeviceName = DeviceName });
 
             result.Should().BeOfType<OperationResult>().Which.Should().Be(expectedResult);
         }
@@ -74,11 +76,11 @@ namespace ET.WebAPI.BusinessLogic.Tests.Unit.Services
                 .Setup(x => x.GetDevices())
                 .Returns(new[] { new Device { DeviceId = Guid.NewGuid() } }.AsQueryable().BuildMock().Object);
             Mock.Get(readingsRepository)
-                .Setup(x => x.StoreWeatherFactorsAsync(It.IsAny<Reading>(), It.IsAny<Guid>()))
+                .Setup(x => x.StoreWeatherFactorsAsync(It.IsAny<ReadingSet>(), It.IsAny<Guid>()))
                 .ThrowsAsync(new DbUpdateException(SampleErrorMessage));
             var service = CreateService();
 
-            var result = await service.StoreWeatherReadingAsync(new Reading());
+            var result = await service.StoreReadingSetAsync(new ReadingSet());
 
             result.Should().BeOfType<OperationResult>().Which.Should().Be(OperationResult.Failure(SampleErrorMessage, ErrorType.Entity));
         }
@@ -91,7 +93,7 @@ namespace ET.WebAPI.BusinessLogic.Tests.Unit.Services
                 .Returns(new[] { new Device { DeviceId = Guid.NewGuid() } }.AsQueryable().BuildMock().Object);
             var service = CreateService();
 
-            var result = await service.StoreWeatherReadingAsync(new Reading());
+            var result = await service.StoreReadingSetAsync(new ReadingSet());
 
             result.Should().BeOfType<OperationResult>().Which.Should().Be(OperationResult.Proceeded());
         }
@@ -101,7 +103,7 @@ namespace ET.WebAPI.BusinessLogic.Tests.Unit.Services
         {
             var service = CreateService();
 
-            await service.StoreWeatherReadingAsync(new Reading());
+            await service.StoreReadingSetAsync(new ReadingSet());
 
             Mock.Get(devicesRepository).Verify(x => x.GetDevices(), Times.Once);
         }
@@ -110,7 +112,7 @@ namespace ET.WebAPI.BusinessLogic.Tests.Unit.Services
         public async Task StoreWeatherReadingAsyncCallsReadingsRepositoryForReadingInsertion()
         {
             var expectedGuid = new Guid("e69c0289-21e3-4b4c-b63a-47d177919142");
-            var deviceReading = new Reading
+            var deviceReading = new ReadingSet
             {
                 Humidity = SampleHumidity,
                 Pressure = SamplePressure,
@@ -123,54 +125,9 @@ namespace ET.WebAPI.BusinessLogic.Tests.Unit.Services
                 .Returns(new[] { new Device { DeviceId = expectedGuid} }.AsQueryable().BuildMock().Object);
             var service = CreateService();
 
-            await service.StoreWeatherReadingAsync(deviceReading);
+            await service.StoreReadingSetAsync(deviceReading);
 
             Mock.Get(readingsRepository).Verify(x => x.StoreWeatherFactorsAsync(deviceReading, expectedGuid), Times.Once);
-        }
-
-        [Test]
-        public async Task GetLatestReadingsAsyncReturnsListOfReadingsResult()
-        {
-            var service = CreateService();
-
-            var result = await service.GetLatestReadingsAsync();
-
-            result.Should().BeOfType<List<Reading>>();
-        }
-        
-        [Test]
-        public async Task GetLatestReadingsAsyncCallsDeviceRepositoryForDevices()
-        {
-            var service = CreateService();
-
-            await service.GetLatestReadingsAsync();
-
-            Mock.Get(devicesRepository).Verify(x => x.GetDevices(), Times.Once);
-        }
-
-        [Test]
-        public async Task GetLatestReadingsAsyncNeverCallsReadingsRepositoryForReadingsIfDeviceRepositoryNotReturnAnyDevice()
-        {
-            var service = CreateService();
-            
-            await service.GetLatestReadingsAsync();
-
-            Mock.Get(readingsRepository).Verify(x => x.GetDeviceReadings(), Times.Never);
-        }
-
-        [Test]
-        public async Task GetLatestReadingsAsyncCallsReadingsRepositoryForReadings()
-        {
-            Mock.Get(devicesRepository)
-                .Setup(x => x.GetDevices())
-                .Returns(new[] { new Device { Latitude = 1222, Longitude = 1223, DeviceName = "Dev1", SensorName = "Sen1" } }
-                    .AsQueryable()
-                    .BuildMock().Object);
-            var service = CreateService();
-
-            await service.GetLatestReadingsAsync();
-
-            Mock.Get(readingsRepository).Verify(x => x.GetDeviceReadings(), Times.Once);
         }
 
         [Test]
@@ -178,7 +135,7 @@ namespace ET.WebAPI.BusinessLogic.Tests.Unit.Services
         {
             var service = CreateService();
 
-            await service.GetNearestLatestReadingAsync(21.37m, 2005.2137m);
+            await service.GetNearestLatestReadingsAsync(21.37m, 2005.2137m);
             
             Mock.Get(devicesRepository).Verify(x=>x.GetDevices(), Times.Once);
         }
@@ -191,7 +148,7 @@ namespace ET.WebAPI.BusinessLogic.Tests.Unit.Services
                 .Returns(new[] { new Device { Latitude = 1222, Longitude = 1223, DeviceName = DeviceName, SensorName = "Sen1" } }.AsQueryable().BuildMock().Object);
             var service = CreateService();
             
-            await service.GetNearestLatestReadingAsync(21.37m, 2005.2137m);
+            await service.GetNearestLatestReadingsAsync(21.37m, 2005.2137m);
             
             Mock.Get(readingsRepository).Verify(x=>x.GetDeviceReadings(), Times.Once);
         }
@@ -204,7 +161,7 @@ namespace ET.WebAPI.BusinessLogic.Tests.Unit.Services
                 .Returns(Array.Empty<Device>().AsQueryable().BuildMock().Object);
             var service = CreateService();
 
-            await service.GetNearestLatestReadingAsync(21.37m, 2005.2137m);
+            await service.GetNearestLatestReadingsAsync(21.37m, 2005.2137m);
 
             Mock.Get(readingsRepository).Verify(x => x.GetDeviceReadings(), Times.Never);
         }
@@ -214,7 +171,7 @@ namespace ET.WebAPI.BusinessLogic.Tests.Unit.Services
         {
             var service = CreateService();
 
-            var result = await service.GetNearestLatestReadingAsync(0, 0);
+            var result = await service.GetNearestLatestReadingsAsync(0, 0);
 
             result.Should().BeNull();
         }
@@ -222,7 +179,7 @@ namespace ET.WebAPI.BusinessLogic.Tests.Unit.Services
         [Test]
         public async Task GetNearestLatestReadingAsyncReturnsReadingWithTheNearestDistanceToGivenCoords()
         {
-            var expectedResult = new Reading { DeviceName = DeviceName };
+            var expectedResult = new ReadingSet { DeviceName = DeviceName };
             var service = CreateService();
             Mock.Get(devicesRepository).Setup(x => x.GetDevices()).Returns(
                 new[]
@@ -233,64 +190,223 @@ namespace ET.WebAPI.BusinessLogic.Tests.Unit.Services
             Mock.Get(readingsRepository).Setup(x => x.GetDeviceReadings()).Returns(
                 new[]
                 {
-                    new Reading { DeviceName = DeviceName },
-                    new Reading { DeviceName = "Dev2" }
+                    new ReadingSet { DeviceName = DeviceName },
+                    new ReadingSet { DeviceName = "Dev2" }
                 }.AsQueryable().BuildMock().Object);
 
-            var result = await service.GetNearestLatestReadingAsync(0, 0);
+            var result = await service.GetNearestLatestReadingsAsync(0, 0);
 
             result.Should().BeEquivalentTo(expectedResult);
         }
 
         [Test]
-        public async Task GetDeviceReadingsAsyncCallsReadingsRepositoryForReadings()
+        public async Task GetReadingsAsyncCallsReadingsRepositoryForReadings()
         {
             var service = CreateService();
 
-            await service.GetDeviceReadingsAsync("Device1", 0);
+            await service.GetReadingsAsync("Device1", 0);
             
             Mock.Get(readingsRepository).Verify(x=>x.GetDeviceReadings(), Times.Once);
         }
 
         [Test]
-        public async Task GetDeviceReadingsAsyncReturnsEmptyArrayIfNoResult()
+        public async Task GetReadingsAsyncReturnsEmptyArrayIfNoResult()
         {
             var service = CreateService();
 
-            var result = await service.GetDeviceReadingsAsync("Device1", 0);
+            var result = await service.GetReadingsAsync("Device1", 0);
 
             result.Should().BeEmpty();
         }
 
         [Test]
-        public async Task GetDeviceReadingsAsyncReturnsArrayOfReadings()
+        public async Task GetReadingsAsyncReturnsList()
         {
             var service = CreateService();
 
-            var result = await service.GetDeviceReadingsAsync("Device1", 0);
+            var result = await service.GetReadingsAsync("Device1", 0);
 
-            result.Should().BeOfType<Reading[]>();
+            result.Should().BeOfType<List<ReadingSet>>();
         }
 
         [Test]
-        public async Task GetDeviceReadingsAsyncReturnsLimitedArrayOfReadings()
+        public async Task GetReadingsAsyncReturnsLimitedArrayOfReadings()
         {
-            var latestDate = DateTimeOffset.Now;
-            var previousDate = DateTimeOffset.Now.AddDays(-5);
-            var expectedResult = new[] { new Reading { Timestamp = latestDate, DeviceName = DeviceName } };
+            var expectedResult = new[] { new ReadingSet { Timestamp = LatestDate, DeviceName = DeviceName } };
             Mock.Get(readingsRepository).Setup(x => x.GetDeviceReadings()).Returns(
                 new[]
                 {
-                    new Reading { Timestamp = latestDate, DeviceName = DeviceName },
-                    new Reading { Timestamp = previousDate, DeviceName = DeviceName }
+                    new ReadingSet { Timestamp = LatestDate, DeviceName = DeviceName },
+                    new ReadingSet { Timestamp = PreviousDate, DeviceName = DeviceName }
                 }.AsQueryable().BuildMock().Object);
             var service = CreateService();
 
-            var result = await service.GetDeviceReadingsAsync(DeviceName, 1);
+            var result = await service.GetReadingsAsync(DeviceName, 1);
 
             result.Should().BeEquivalentTo(expectedResult);
         }
+
+        [TestCase(ReadingType.Temperature)]
+        [TestCase(ReadingType.Aqi)]
+        [TestCase(ReadingType.Humidity)]
+        [TestCase(ReadingType.Pressure)]
+        public async Task GetTypedReadingsAsyncReturnsCollectionOfReadings(ReadingType readingType)
+        {
+            var expectedResult = new Reading[]
+            {
+                new()
+                {
+                    Timestamp = LatestDate,
+                    Value = 2
+                },
+                new()
+                {
+                    Timestamp = PreviousDate,
+                    Value = 3
+                }
+            };
+            Mock.Get(readingsRepository)
+                .Setup(x => x.GetDeviceReadings())
+                .Returns(
+                    new[]
+                    {
+                        new ReadingSet { Timestamp = LatestDate, DeviceName = DeviceName, Humidity = 2, Pressure = 2, Temperature = 2, AirQualityIndex = 2},
+                        new ReadingSet { Timestamp = PreviousDate, DeviceName = DeviceName, Humidity = 3, Pressure = 3, Temperature = 3, AirQualityIndex = 3}
+                    }.AsQueryable().BuildMock().Object);
+            var service = CreateService();
+
+            var result = await service.GetTypedReadingsAsync(DeviceName, readingType, 0);
+
+            result.Should().BeEquivalentTo(expectedResult);
+        }
+
+        [TestCase(ReadingType.Temperature)]
+        [TestCase(ReadingType.Aqi)]
+        [TestCase(ReadingType.Humidity)]
+        [TestCase(ReadingType.Pressure)]
+        public async Task GetTypedReadingsAsyncReturnsLimitedCollectionOfReadings(ReadingType readingType)
+        {
+            var expectedResult = new Reading[] { new() { Timestamp = LatestDate, Value = 2 } };
+            Mock.Get(readingsRepository)
+                .Setup(x => x.GetDeviceReadings())
+                .Returns(
+                    new[]
+                    {
+                        new ReadingSet { Timestamp = LatestDate, DeviceName = DeviceName, Humidity = 2, Pressure = 2, Temperature = 2, AirQualityIndex = 2},
+                        new ReadingSet { Timestamp = PreviousDate, DeviceName = DeviceName, Humidity = 3, Pressure = 3, Temperature = 3, AirQualityIndex = 3}
+                    }.AsQueryable().BuildMock().Object);
+            var service = CreateService();
+
+            var result = await service.GetTypedReadingsAsync(DeviceName, readingType, 1);
+
+            result.Should().BeEquivalentTo(expectedResult);
+        }
+
+        [TestCase(ReadingType.Temperature)]
+        [TestCase(ReadingType.Aqi)]
+        [TestCase(ReadingType.Humidity)]
+        [TestCase(ReadingType.Pressure)]
+        public async Task GetTypedReadingsAsyncReturnsEmptyCollectionOfReadingsIfRepositoryYieldsEmptyResult(ReadingType readingType)
+        {
+            Mock.Get(readingsRepository)
+                .Setup(x => x.GetDeviceReadings())
+                .Returns(Array.Empty<ReadingSet>().AsQueryable().BuildMock().Object);
+            var service = CreateService();
+
+            var result = await service.GetTypedReadingsAsync(DeviceName, readingType, 0);
+
+            result.Should().BeEmpty();
+        }
+
+        [TestCase(ReadingType.Temperature)]
+        [TestCase(ReadingType.Aqi)]
+        [TestCase(ReadingType.Humidity)]
+        [TestCase(ReadingType.Pressure)]
+        public async Task GetTypedLatestReadingAsyncReturnsLatestReading(ReadingType readingType)
+        {
+            var expectedResult = new Reading
+            {
+                Timestamp = LatestDate,
+                Value = 2
+            };
+            Mock.Get(readingsRepository)
+                .Setup(x => x.GetDeviceReadings())
+                .Returns(
+                    new[]
+                    {
+                        new ReadingSet { Timestamp = LatestDate, DeviceName = DeviceName, Humidity = 2, Pressure = 2, Temperature = 2, AirQualityIndex = 2},
+                        new ReadingSet { Timestamp = PreviousDate, DeviceName = DeviceName, Humidity = 3, Pressure = 3, Temperature = 3, AirQualityIndex = 3 }
+                    }.AsQueryable().BuildMock().Object);
+            var service = CreateService();
+            
+            var result = await service.GetTypedLatestReadingAsync(DeviceName, readingType);
+
+            result.Should().BeEquivalentTo(expectedResult);
+        }
+
+        [TestCase(ReadingType.Temperature)]
+        [TestCase(ReadingType.Aqi)]
+        [TestCase(ReadingType.Humidity)]
+        [TestCase(ReadingType.Pressure)]
+        public async Task GetTypedLatestReadingAsyncReturnsNullIfNoReadingExist(ReadingType readingType)
+        {
+            Mock.Get(readingsRepository)
+                .Setup(x => x.GetDeviceReadings())
+                .Returns(Array.Empty<ReadingSet>().AsQueryable().BuildMock().Object);
+            var service = CreateService();
+
+            var result = await service.GetTypedLatestReadingAsync(DeviceName, readingType);
+
+            result.Should().BeNull();
+        }
+
+        [TestCase(ReadingType.Temperature)]
+        [TestCase(ReadingType.Aqi)]
+        [TestCase(ReadingType.Humidity)]
+        [TestCase(ReadingType.Pressure)]
+        public async Task GetTypedLatestReadingsAsyncReturnsNullIfReadingsSetContainsNullValues(ReadingType readingType)
+        {
+            Mock.Get(readingsRepository)
+                .Setup(x => x.GetDeviceReadings())
+                .Returns(
+                    new[]
+                    {
+                        new ReadingSet { Timestamp = LatestDate, DeviceName = DeviceName, Humidity = null, Pressure = null, Temperature = null, AirQualityIndex = null},
+                        new ReadingSet { Timestamp = PreviousDate, DeviceName = DeviceName, Humidity = null, Pressure = null, Temperature = null, AirQualityIndex = null}
+                    }.AsQueryable().BuildMock().Object);
+            var service = CreateService();
+            
+            var result = await service.GetTypedLatestReadingAsync(DeviceName, readingType);
+
+            result.Should().BeNull();
+        }
         
+        [TestCase(ReadingType.Temperature)]
+        [TestCase(ReadingType.Aqi)]
+        [TestCase(ReadingType.Humidity)]
+        [TestCase(ReadingType.Pressure)]
+        public async Task GetTypedLatestReadingsAsyncReturnsLatestKnownReadings(ReadingType readingType)
+        {
+            var expectedResult = new Reading
+            {
+                Timestamp = PreviousDate,
+                Value = 3
+            };
+            Mock.Get(readingsRepository)
+                .Setup(x => x.GetDeviceReadings())
+                .Returns(
+                    new[]
+                    {
+                        new ReadingSet { Timestamp = LatestDate, DeviceName = DeviceName, Humidity = null, Pressure = null, Temperature = null, AirQualityIndex = null },
+                        new ReadingSet { Timestamp = PreviousDate, DeviceName = DeviceName, Humidity = 3, Pressure = 3, Temperature = 3, AirQualityIndex = 3 }
+                    }.AsQueryable().BuildMock().Object);
+            var service = CreateService();
+            
+            var result = await service.GetTypedLatestReadingAsync(DeviceName, readingType);
+
+            result.Should().BeEquivalentTo(expectedResult);
+        }
+
         private ReadingsService CreateService() => new(readingsRepository, devicesRepository);
     }
 }

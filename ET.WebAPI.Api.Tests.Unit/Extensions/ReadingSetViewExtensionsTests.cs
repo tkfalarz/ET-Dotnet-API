@@ -8,21 +8,21 @@ using System;
 namespace ET.WebAPI.Api.Tests.Unit.Extensions
 {
     [TestFixture]
-    public class ReadingExtensionsTests
+    public class ReadingSetViewExtensionsTests
     {
         [Test]
         public void ThrowsArgumentNullExceptionIfViewIsNull()
         {
-            Action action = () => ((ReadingView)null).ToModel();
+            Action action = () => ((ReadingSetView)null).ToModel();
 
-            action.Should().Throw<ArgumentNullException>().Which.ParamName.Should().Be("view");
+            action.Should().Throw<ArgumentNullException>().Which.ParamName.Should().Be("setView");
         }
 
         [Test]
         public void ToModelTest()
         {
             var dateTimeOffset = DateTimeOffset.Now;
-            var view = new ReadingView
+            var view = new ReadingSetView
             {
                 Humidity = 2,
                 Pressure = 1,
@@ -31,7 +31,7 @@ namespace ET.WebAPI.Api.Tests.Unit.Extensions
                 Timestamp = dateTimeOffset,
                 DeviceName = "Dev1"
             };
-            var expectedModel = new Reading
+            var expectedModel = new ReadingSet
             {
                 Humidity = 2,
                 Pressure = 1,

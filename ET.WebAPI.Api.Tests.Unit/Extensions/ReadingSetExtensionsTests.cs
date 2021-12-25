@@ -8,12 +8,12 @@ using System;
 namespace ET.WebAPI.Api.Tests.Unit.Extensions
 {
     [TestFixture]
-    public class ReadingViewExtensionsTests
+    public class ReadingSetExtensionsTests
     {
         [Test]
         public void ToViewShouldThrowArgumentNullExceptionIfModelIsNull()
         {
-            Action action = () => ((Reading)null).ToView();
+            Action action = () => ((ReadingSet)null).ToView();
 
             action.Should().Throw<ArgumentNullException>().Which.ParamName.Should().Be("model");
         }
@@ -26,7 +26,7 @@ namespace ET.WebAPI.Api.Tests.Unit.Extensions
             const double temp = 11;
             const double press = 999;
             var dto = DateTimeOffset.Now;
-            var model = new Reading
+            var model = new ReadingSet
             {
                 Humidity = hum,
                 Pressure = press,
@@ -35,7 +35,7 @@ namespace ET.WebAPI.Api.Tests.Unit.Extensions
                 DeviceName = "dev1",
                 AirQualityIndex = aqi
             };
-            var expectedResult = new ReadingView
+            var expectedResult = new ReadingSetView
             {
                 Humidity = hum,
                 Pressure = press,

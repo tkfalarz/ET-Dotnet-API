@@ -31,7 +31,7 @@ namespace ET.WebAPI.Api.Controllers
         [SwaggerResponse((int)HttpStatusCode.BadRequest)]
         [SwaggerResponse((int)HttpStatusCode.InternalServerError)]
         [SwaggerResponse((int)HttpStatusCode.Unauthorized)]
-        public async Task<IActionResult> StoreReadingAsync([FromBody, Required] ReadingView reading)
+        public async Task<IActionResult> StoreReadingAsync([FromBody, Required] ReadingSetView readingSet)
         {
             if (!ModelState.IsValid)
             {
@@ -40,52 +40,21 @@ namespace ET.WebAPI.Api.Controllers
                 return BadRequest();
             }
 
-            var result = await readingsService.StoreWeatherReadingAsync(reading.ToModel());
-            if (!result.IsProceeded)
-            {
-                logger.LogError(result.ErrorMessage);
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
-
-            return Accepted();
-        }
-        
-        [HttpGet]
-        [Route("{deviceName}")]
-        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(ReadingView[]))]
-        [SwaggerResponse((int)HttpStatusCode.BadRequest)]
-        [SwaggerResponse((int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> GetDeviceReadingsAsync([Required] string deviceName, [FromQuery] int limit = 0)
-        {
-            var result = await readingsService.GetDeviceReadingsAsync(deviceName, limit);
-            return result.Any()
-                ? Ok(result.Select(x => x.ToView()).ToArray())
-                : NotFound();
+            var result = await readingsService.StoreReadingSetAsync(readingSet.ToModel());
+            if (result.IsProceeded) return Accepted();
+            logger.LogError(result.ErrorMessage);
+            return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
         }
 
         [HttpGet]
-        [Route("latest")]
-        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(ReadingView))]
-        [SwaggerResponse((int)HttpStatusCode.BadRequest)]
+        [SwaggerResponse((int)HttpStatusCode.OK)]
         [SwaggerResponse((int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> GetNearestLatestReadingAsync([FromQuery, Required] decimal latitude, decimal longitude)
+        [Route("nearest")]
+        public async Task<IActionResult> GetNearestLatestReadingsSetAsync([FromQuery] decimal latitude, [FromQuery] decimal longitude)
         {
-            var result = await readingsService.GetNearestLatestReadingAsync(latitude, longitude);
-            return result == null
-                ? NotFound()
-                : Ok(result.ToView());
-        }
-
-        [HttpGet]
-        [Route("latest/allDevices")]
-        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(ReadingView[]))]
-        [SwaggerResponse((int)HttpStatusCode.BadRequest)]
-        [SwaggerResponse((int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> GetDevicesLatestReadingsAsync()
-        {
-            var result = await readingsService.GetLatestReadingsAsync();
-            return result.Any()
-                ? Ok(result.Select(x=>x.ToView()).ToArray())
+            var readings = await readingsService.GetNearestLatestReadingsAsync(latitude, longitude);
+            return readings != null
+                ? Ok(readings.ToView())
                 : NotFound();
         }
     }

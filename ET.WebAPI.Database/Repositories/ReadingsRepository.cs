@@ -16,62 +16,127 @@ namespace ET.WebAPI.Database.Repositories
             this.dbContext = dbContext;
         }
 
-        public async Task StoreWeatherFactorsAsync(Reading reading, Guid deviceId)
+        public IQueryable<ReadingSet> GetDeviceReadings()
         {
-            if (reading == null)
-                throw new ArgumentNullException("Weather reading or device id cannot be null");
+            var distinctDatesWithDevices = dbContext.NumericReadings
+                .Select(x => new { x.DeviceId, x.Timestamp })
+                .Distinct();
 
-            await dbContext.AqiReadings.AddAsync(
-                new AqiReading
+            var aqi = from d in distinctDatesWithDevices
+                join dv in dbContext.Devices on d.DeviceId equals dv.Id
+                join a in dbContext.NumericReadings.Where(x => x.ReadingType == NumericReadingType.AirQualityIndex)
+                    on new { d.DeviceId, d.Timestamp }
+                    equals new { a.DeviceId, a.Timestamp }
+                    into joinedAqi
+                from j in joinedAqi.DefaultIfEmpty()
+                select new ReadingSet
                 {
-                    DeviceId = deviceId,
-                    Timestamp = reading.Timestamp,
-                    Value = reading.AirQualityIndex
-                });
-            await dbContext.HumidityReadings.AddAsync(
-                new HumidityReading
-                {
-                    DeviceId = deviceId,
-                    Timestamp = reading.Timestamp,
-                    Value = reading.Humidity
-                });
-            await dbContext.PressureReadings.AddAsync(
-                new PressureReading
-                {
-                    DeviceId = deviceId,
-                    Timestamp = reading.Timestamp,
-                    Value = reading.Pressure
-                });
-            await dbContext.TemperatureReadings.AddAsync(
-                new TemperatureReading
-                {
-                    DeviceId = deviceId,
-                    Timestamp = reading.Timestamp,
-                    Value = reading.Temperature
-                });
+                    DeviceName = dv.Name,
+                    Timestamp = d.Timestamp,
+                    AirQualityIndex = j.Value
+                };
 
-            await dbContext.SaveChangesAsync();
-        }
+            var temperature = from d in distinctDatesWithDevices
+                join dv in dbContext.Devices on d.DeviceId equals dv.Id
+                join t in dbContext.NumericReadings.Where(x => x.ReadingType == NumericReadingType.Temperature)
+                    on new { d.DeviceId, d.Timestamp }
+                    equals new { t.DeviceId, t.Timestamp }
+                    into joinedAqi
+                from j in joinedAqi.DefaultIfEmpty()
+                select new ReadingSet
+                {
+                    DeviceName = dv.Name,
+                    Timestamp = d.Timestamp,
+                    Temperature = j.Value
+                };
 
-        public IQueryable<Reading> GetDeviceReadings()
-        {
-            var query =
-                from a in dbContext.AqiReadings
-                join h in dbContext.HumidityReadings on new { a.DeviceId, a.Timestamp } equals new { h.DeviceId, h.Timestamp }
-                join p in dbContext.PressureReadings on new { a.DeviceId, a.Timestamp } equals new { p.DeviceId, p.Timestamp }
-                join t in dbContext.TemperatureReadings on new { a.DeviceId, a.Timestamp } equals new { t.DeviceId, t.Timestamp }
-                join d in dbContext.Devices on a.DeviceId equals d.Id
-                select new Reading
+            var humidity = from d in distinctDatesWithDevices
+                join dv in dbContext.Devices on d.DeviceId equals dv.Id
+                join h in dbContext.NumericReadings.Where(x => x.ReadingType == NumericReadingType.Humidity)
+                    on new { d.DeviceId, d.Timestamp }
+                    equals new { h.DeviceId, h.Timestamp }
+                    into joined
+                from j in joined.DefaultIfEmpty()
+                select new ReadingSet
+                {
+                    DeviceName = dv.Name,
+                    Timestamp = d.Timestamp,
+                    Humidity = j.Value
+                };
+
+            var pressure = from d in distinctDatesWithDevices
+                join dv in dbContext.Devices on d.DeviceId equals dv.Id
+                join p in dbContext.NumericReadings.Where(x => x.ReadingType == NumericReadingType.Pressure)
+                    on new { d.DeviceId, d.Timestamp }
+                    equals new { p.DeviceId, p.Timestamp }
+                    into joined
+                from j in joined.DefaultIfEmpty()
+                select new ReadingSet
+                {
+                    DeviceName = dv.Name,
+                    Timestamp = d.Timestamp,
+                    Pressure = j.Value
+                };
+
+            var combinedFactorsQuery = from a in aqi
+                join t in temperature on new { a.Timestamp, a.DeviceName } equals new { t.Timestamp, t.DeviceName }
+                join h in humidity on new { a.Timestamp, a.DeviceName } equals new { h.Timestamp, h.DeviceName }
+                join p in pressure on new { a.Timestamp, a.DeviceName } equals new { p.Timestamp, p.DeviceName }
+                select new ReadingSet
                 {
                     Timestamp = a.Timestamp,
-                    AirQualityIndex = a.Value,
-                    Humidity = h.Value,
-                    Pressure = p.Value,
-                    Temperature = t.Value,
-                    DeviceName = d.Name
+                    DeviceName = a.DeviceName,
+                    AirQualityIndex = a.AirQualityIndex,
+                    Temperature = t.Temperature,
+                    Humidity = h.Humidity,
+                    Pressure = p.Pressure
                 };
-            
-            return query;
+            return combinedFactorsQuery;
+        }
+
+        public async Task StoreWeatherFactorsAsync(ReadingSet readingSet, Guid deviceId)
+        {
+            if (readingSet == null)
+                throw new ArgumentNullException(nameof(readingSet),"Weather reading or device id cannot be null");
+
+            if(readingSet.AirQualityIndex.HasValue)
+                await dbContext.NumericReadings.AddAsync(
+                    new NumericReading
+                    {
+                        DeviceId = deviceId,
+                        Timestamp = readingSet.Timestamp,
+                        ReadingType = NumericReadingType.AirQualityIndex,
+                        Value = readingSet.AirQualityIndex.Value
+                    });
+            if(readingSet.Humidity.HasValue)
+                await dbContext.NumericReadings.AddAsync(
+                    new NumericReading
+                    {
+                        DeviceId = deviceId,
+                        Timestamp = readingSet.Timestamp,
+                        ReadingType = NumericReadingType.Humidity,
+                        Value = readingSet.Humidity.Value
+                    });
+            if(readingSet.Pressure.HasValue)
+                await dbContext.NumericReadings.AddAsync(
+                    new NumericReading
+                    {
+                        DeviceId = deviceId,
+                        Timestamp = readingSet.Timestamp,
+                        ReadingType = NumericReadingType.Pressure,
+                        Value = readingSet.Pressure.Value
+                    });
+            if(readingSet.Temperature.HasValue)
+                await dbContext.NumericReadings.AddAsync(
+                    new NumericReading
+                    {
+                        DeviceId = deviceId,
+                        Timestamp = readingSet.Timestamp,
+                        ReadingType = NumericReadingType.Temperature,
+                        Value = readingSet.Temperature.Value
+                    });
+
+            await dbContext.SaveChangesAsync();
         }
     }
 }

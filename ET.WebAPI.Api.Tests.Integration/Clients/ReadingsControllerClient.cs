@@ -43,18 +43,12 @@ namespace ET.WebAPI.Api.Tests.Integration.Clients
                 .CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
         }
 
-        public async Task<HttpResponseMessage> StoreReadingAsync(ReadingView content) 
+        public async Task<HttpResponseMessage> StoreReadingAsync(ReadingSetView content) 
             => await HttpClient.PostAsync(ReadingsBaseUrl, JsonContent.Create(content));
 
-        public async Task<HttpResponseMessage> GetNearestLatestReadingAsync(decimal latitude, decimal longitude) 
-            => await HttpClient.GetAsync($"{ReadingsBaseUrl}/latest?latitude={latitude}&longitude={longitude}");
+        public async Task<HttpResponseMessage> GetNearestLatestReadingsAsync(decimal latitude, decimal longitude) 
+            => await HttpClient.GetAsync($"api/Readings/nearest?latitude={latitude}&longitude={longitude}");
 
-        public async Task<HttpResponseMessage> GetLatestReadingsAsync() 
-            => await HttpClient.GetAsync($"{ReadingsBaseUrl}/latest/allDevices");
-
-        public async Task<HttpResponseMessage> GetDeviceReadingsAsync(string deviceName) 
-            => await HttpClient.GetAsync($"{ReadingsBaseUrl}/{deviceName}");
-
-        private string ConnectionString => TestDbConnectionStringProvider.GetConnectionString($"{nameof(ReadingsControllerClient)}-WebApiTests");
+        private static string ConnectionString => TestDbConnectionStringProvider.GetConnectionString($"{nameof(ReadingsControllerClient)}-WebApiTests");
     }
 }
