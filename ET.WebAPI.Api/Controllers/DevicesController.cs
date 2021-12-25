@@ -1,6 +1,5 @@
 using ET.WebAPI.Api.Extensions;
 using ET.WebAPI.Api.Views;
-using ET.WebAPI.Kernel.DomainModels;
 using ET.WebAPI.Kernel.DomainServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -112,14 +111,14 @@ namespace ET.WebAPI.Api.Controllers
         [SwaggerResponse((int)HttpStatusCode.BadRequest)]
         [SwaggerResponse((int)HttpStatusCode.NotFound)]
         [Route("{deviceName}/Readings/{readingType}")]
-        public async Task<IActionResult> GetDeviceWeatherFactorReadingsAsync(string deviceName, ReadingType readingType, [FromQuery] int limit)
+        public async Task<IActionResult> GetDeviceWeatherFactorReadingsAsync(string deviceName, ReadingTypeView readingType, [FromQuery] int limit)
         {
-            if (!Enum.IsDefined(typeof(ReadingType), readingType))
+            if (!Enum.IsDefined(typeof(ReadingTypeView), readingType))
                 return BadRequest(FactorNotSupportedErrorMessage);
             if (limit < 0)
                 return BadRequest(LimitCriteriaBelowValueErrorMessage);
 
-            var result = await readingsService.GetTypedReadingsAsync(deviceName, readingType, limit);
+            var result = await readingsService.GetTypedReadingsAsync(deviceName, readingType.ToModel(), limit);
             return result != null && result.Any()
                 ? Ok(result.Select(x => x.ToView()).ToList())
                 : NotFound();
@@ -130,12 +129,12 @@ namespace ET.WebAPI.Api.Controllers
         [SwaggerResponse((int)HttpStatusCode.BadRequest)]
         [SwaggerResponse((int)HttpStatusCode.NotFound)]
         [Route("{deviceName}/Readings/{readingType}/Latest")]
-        public async Task<IActionResult> GetDeviceWeatherFactorLatestReadingAsync(string deviceName, ReadingType readingType)
+        public async Task<IActionResult> GetDeviceWeatherFactorLatestReadingAsync(string deviceName, ReadingTypeView readingType)
         {
-            if (!Enum.IsDefined(typeof(ReadingType), readingType))
+            if (!Enum.IsDefined(typeof(ReadingTypeView), readingType))
                 return BadRequest(FactorNotSupportedErrorMessage);
 
-            var result = await readingsService.GetTypedLatestReadingAsync(deviceName, readingType);
+            var result = await readingsService.GetTypedLatestReadingAsync(deviceName, readingType.ToModel());
             return result != null
                 ? Ok(result.ToView())
                 : NotFound();

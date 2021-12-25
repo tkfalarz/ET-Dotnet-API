@@ -1,4 +1,5 @@
 using ET.WebAPI.Api.Controllers;
+using ET.WebAPI.Api.Extensions;
 using ET.WebAPI.Api.Views;
 using ET.WebAPI.Kernel.DomainModels;
 using ET.WebAPI.Kernel.DomainServices;
@@ -207,15 +208,15 @@ namespace ET.WebAPI.Api.Tests.Unit.Controllers
             result.Should().BeOfType<NotFoundResult>();
         }
 
-        [TestCase(ReadingType.Aqi)]
-        [TestCase(ReadingType.Temperature)]
-        [TestCase(ReadingType.Humidity)]
-        [TestCase(ReadingType.Pressure)]
-        public async Task GetDeviceWeatherFactorReadingsAsyncReturnsNotFoundIfReadingsCollectionIsNull(ReadingType readingType)
+        [TestCase(ReadingTypeView.Aqi)]
+        [TestCase(ReadingTypeView.Temperature)]
+        [TestCase(ReadingTypeView.Humidity)]
+        [TestCase(ReadingTypeView.Pressure)]
+        public async Task GetDeviceWeatherFactorReadingsAsyncReturnsNotFoundIfReadingsCollectionIsNull(ReadingTypeView readingType)
         {
             const string device = "dev";
             Mock.Get(readingsService)
-                .Setup(x => x.GetTypedReadingsAsync(device, readingType, 0))
+                .Setup(x => x.GetTypedReadingsAsync(device, readingType.ToModel(), 0))
                 .ReturnsAsync((IReadOnlyList<Reading>)null);
             var controller = CreateController();
 
@@ -224,15 +225,15 @@ namespace ET.WebAPI.Api.Tests.Unit.Controllers
             result.Should().BeOfType<NotFoundResult>();
         }
         
-        [TestCase(ReadingType.Aqi)]
-        [TestCase(ReadingType.Temperature)]
-        [TestCase(ReadingType.Humidity)]
-        [TestCase(ReadingType.Pressure)]
-        public async Task GetDeviceWeatherFactorReadingsAsyncReturnsNotFoundIfReadingsCollectionIsEmpty(ReadingType readingType)
+        [TestCase(ReadingTypeView.Aqi)]
+        [TestCase(ReadingTypeView.Temperature)]
+        [TestCase(ReadingTypeView.Humidity)]
+        [TestCase(ReadingTypeView.Pressure)]
+        public async Task GetDeviceWeatherFactorReadingsAsyncReturnsNotFoundIfReadingsCollectionIsEmpty(ReadingTypeView readingType)
         {
             const string device = "dev";
             Mock.Get(readingsService)
-                .Setup(x => x.GetTypedReadingsAsync(device, readingType, 0))
+                .Setup(x => x.GetTypedReadingsAsync(device, readingType.ToModel(), 0))
                 .ReturnsAsync(new List<Reading>());
             var controller = CreateController();
 
@@ -246,16 +247,16 @@ namespace ET.WebAPI.Api.Tests.Unit.Controllers
         {
             var controller = CreateController();
 
-            var result = await controller.GetDeviceWeatherFactorReadingsAsync("device", (ReadingType)69, 0);
+            var result = await controller.GetDeviceWeatherFactorReadingsAsync("device", (ReadingTypeView)69, 0);
 
             result.Should().BeOfType<BadRequestObjectResult>().Which.Value.Should().Be(FactorNotSupportedErrorMessage);
         }
         
-        [TestCase(ReadingType.Aqi)]
-        [TestCase(ReadingType.Temperature)]
-        [TestCase(ReadingType.Humidity)]
-        [TestCase(ReadingType.Pressure)]
-        public async Task GetDeviceWeatherFactorReadingsAsyncReturnsBadRequestIfInvalidLimitProvided(ReadingType readingType)
+        [TestCase(ReadingTypeView.Aqi)]
+        [TestCase(ReadingTypeView.Temperature)]
+        [TestCase(ReadingTypeView.Humidity)]
+        [TestCase(ReadingTypeView.Pressure)]
+        public async Task GetDeviceWeatherFactorReadingsAsyncReturnsBadRequestIfInvalidLimitProvided(ReadingTypeView readingType)
         {
             var controller = CreateController();
 
@@ -264,15 +265,15 @@ namespace ET.WebAPI.Api.Tests.Unit.Controllers
             result.Should().BeOfType<BadRequestObjectResult>().Which.Value.Should().Be(LimitCriteriaBelowValueErrorMessage);
         }
 
-        [TestCase(ReadingType.Aqi)]
-        [TestCase(ReadingType.Temperature)]
-        [TestCase(ReadingType.Humidity)]
-        [TestCase(ReadingType.Pressure)]
-        public async Task GetDeviceWeatherFactorReadingsAsyncReturnsOkObjectResult(ReadingType readingType)
+        [TestCase(ReadingTypeView.Aqi)]
+        [TestCase(ReadingTypeView.Temperature)]
+        [TestCase(ReadingTypeView.Humidity)]
+        [TestCase(ReadingTypeView.Pressure)]
+        public async Task GetDeviceWeatherFactorReadingsAsyncReturnsOkObjectResult(ReadingTypeView readingType)
         {
             const string device = "dev";
             Mock.Get(readingsService)
-                .Setup(x => x.GetTypedReadingsAsync(device, readingType, 0))
+                .Setup(x => x.GetTypedReadingsAsync(device, readingType.ToModel(), 0))
                 .ReturnsAsync(new List<Reading> { new() });
             var controller = CreateController();
 
@@ -282,15 +283,15 @@ namespace ET.WebAPI.Api.Tests.Unit.Controllers
 
         }
         
-        [TestCase(ReadingType.Aqi)]
-        [TestCase(ReadingType.Temperature)]
-        [TestCase(ReadingType.Humidity)]
-        [TestCase(ReadingType.Pressure)]
-        public async Task GetDeviceLatestWeatherFactorReadingsAsyncReturnsNotFoundIfReadingIsNull(ReadingType readingType)
+        [TestCase(ReadingTypeView.Aqi)]
+        [TestCase(ReadingTypeView.Temperature)]
+        [TestCase(ReadingTypeView.Humidity)]
+        [TestCase(ReadingTypeView.Pressure)]
+        public async Task GetDeviceLatestWeatherFactorReadingsAsyncReturnsNotFoundIfReadingIsNull(ReadingTypeView readingType)
         {
             const string device = "dev1";
             Mock.Get(readingsService)
-                .Setup(x => x.GetTypedLatestReadingAsync(device, readingType))
+                .Setup(x => x.GetTypedLatestReadingAsync(device, readingType.ToModel()))
                 .ReturnsAsync((Reading)null);
             var controller = CreateController();
 
@@ -299,15 +300,15 @@ namespace ET.WebAPI.Api.Tests.Unit.Controllers
             result.Should().BeOfType<NotFoundResult>();
         }
 
-        [TestCase(ReadingType.Aqi)]
-        [TestCase(ReadingType.Temperature)]
-        [TestCase(ReadingType.Humidity)]
-        [TestCase(ReadingType.Pressure)]
-        public async Task GetDeviceLatestWeatherFactorReadingsAsyncReturnsOkObjectResult(ReadingType readingType)
+        [TestCase(ReadingTypeView.Aqi)]
+        [TestCase(ReadingTypeView.Temperature)]
+        [TestCase(ReadingTypeView.Humidity)]
+        [TestCase(ReadingTypeView.Pressure)]
+        public async Task GetDeviceLatestWeatherFactorReadingsAsyncReturnsOkObjectResult(ReadingTypeView readingType)
         {
             const string device = "dev1";
             Mock.Get(readingsService)
-                .Setup(x => x.GetTypedLatestReadingAsync(device, readingType))
+                .Setup(x => x.GetTypedLatestReadingAsync(device, readingType.ToModel()))
                 .ReturnsAsync(new Reading());
             var controller = CreateController();
 
