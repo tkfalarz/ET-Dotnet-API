@@ -61,17 +61,14 @@ namespace ET.WebApi.Database.Tests.Integration.Repositories
         [TearDown]
         public void AfterEach()
         {
-            dbContext.AqiReadings.RemoveRange(dbContext.AqiReadings);
-            dbContext.HumidityReadings.RemoveRange(dbContext.HumidityReadings);
-            dbContext.PressureReadings.RemoveRange(dbContext.PressureReadings);
-            dbContext.TemperatureReadings.RemoveRange(dbContext.TemperatureReadings);
+            dbContext.NumericReadings.RemoveRange(dbContext.NumericReadings);
             dbContext.SaveChanges();
         }
 
         [Test]
         public async Task StoreWeatherFactorsAsyncStoresWeatherFactors()
         {
-            var reading = new Reading
+            var reading = new ReadingSet
             {
                 Humidity = HumidityValue,
                 Pressure = PressureValue,
@@ -79,41 +76,43 @@ namespace ET.WebApi.Database.Tests.Integration.Repositories
                 AirQualityIndex = AirQualityIndexValue,
                 Timestamp = Timestamp
             };
+            var expectedResult = new NumericReading[]
+            {
+                new()
+                {
+                    DeviceId = Device1Id,
+                    Timestamp = Timestamp,
+                    ReadingType = NumericReadingType.AirQualityIndex,
+                    Value = AirQualityIndexValue
+                },
+                new()
+                {
+                    DeviceId = Device1Id,
+                    Timestamp = Timestamp,
+                    ReadingType = NumericReadingType.Humidity,
+                    Value = HumidityValue
+                },
+                new()
+                {
+                    DeviceId = Device1Id,
+                    Timestamp = Timestamp,
+                    ReadingType = NumericReadingType.Temperature,
+                    Value = TemperatureValue
+                },
+                new()
+                {
+                    DeviceId = Device1Id,
+                    Timestamp = Timestamp,
+                    ReadingType = NumericReadingType.Pressure,
+                    Value = PressureValue
+                }
+            };
 
             await repository.StoreWeatherFactorsAsync(reading, Device1Id);
 
-            dbContext.AqiReadings.First(x => x.DeviceId == Device1Id).Should().BeEquivalentTo(
-                new AqiReading
-                {
-                    DeviceId = Device1Id,
-                    Timestamp = Timestamp,
-                    Value = AirQualityIndexValue
-                },
-                opt => opt.Excluding(x => x.Device));
-            dbContext.HumidityReadings.First(x => x.DeviceId == Device1Id).Should().BeEquivalentTo(
-                new HumidityReading
-                {
-                    DeviceId = Device1Id,
-                    Timestamp = Timestamp,
-                    Value = HumidityValue
-                },
-                opt => opt.Excluding(x => x.Device));
-            dbContext.TemperatureReadings.First(x => x.DeviceId == Device1Id).Should().BeEquivalentTo(
-                new TemperatureReading
-                {
-                    DeviceId = Device1Id,
-                    Timestamp = Timestamp,
-                    Value = TemperatureValue
-                },
-                opt => opt.Excluding(x => x.Device));
-            dbContext.PressureReadings.First(x => x.DeviceId == Device1Id).Should().BeEquivalentTo(
-                new PressureReading
-                {
-                    DeviceId = Device1Id,
-                    Timestamp = Timestamp,
-                    Value = PressureValue
-                },
-                opt => opt.Excluding(x => x.Device));
+            dbContext.NumericReadings
+                .Where(x => x.DeviceId == Device1Id).Should()
+                .BeEquivalentTo(expectedResult, opt => opt.Excluding(x => x.Device));
         }
 
         [Test]
@@ -124,7 +123,7 @@ namespace ET.WebApi.Database.Tests.Integration.Repositories
             AddDevicesReadings(date1, date2);
             var expectedResult = new[]
             {
-                new Reading
+                new ReadingSet
                 {
                     Timestamp = date1,
                     Humidity = HumidityValue,
@@ -133,7 +132,7 @@ namespace ET.WebApi.Database.Tests.Integration.Repositories
                     AirQualityIndex = AirQualityIndexValue,
                     DeviceName = Device1Name
                 },
-                new Reading
+                new ReadingSet
                 {
                     Timestamp = date2,
                     Humidity = HumidityValue,
@@ -142,7 +141,7 @@ namespace ET.WebApi.Database.Tests.Integration.Repositories
                     AirQualityIndex = AirQualityIndexValue,
                     DeviceName = Device1Name
                 },
-                new Reading
+                new ReadingSet
                 {
                     Timestamp = date1,
                     Humidity = HumidityValue,
@@ -159,6 +158,43 @@ namespace ET.WebApi.Database.Tests.Integration.Repositories
         }
 
         [Test]
+        public void GetDeviceReadingsPartialTest()
+        {
+            var expectedResult = new[]
+            {
+                new ReadingSet
+                {
+                    Timestamp = Timestamp,
+                    DeviceName = Device1Name,
+                    Humidity = HumidityValue,
+                    Temperature = TemperatureValue,
+                    Pressure = null,
+                    AirQualityIndex = null
+                }
+            };
+            dbContext.NumericReadings.AddRange(
+                new NumericReading
+                {
+                    DeviceId = Device1Id,
+                    ReadingType = NumericReadingType.Temperature,
+                    Timestamp = Timestamp,
+                    Value = TemperatureValue
+                },
+                new NumericReading
+                {
+                    DeviceId = Device1Id,
+                    ReadingType = NumericReadingType.Humidity,
+                    Timestamp = Timestamp,
+                    Value = HumidityValue
+                });
+            dbContext.SaveChanges();
+
+            var result = repository.GetDeviceReadings();
+
+            result.Should().BeEquivalentTo(expectedResult);
+        }
+
+        [Test]
         public void GetDeviceReadingsEmptyCase()
         {
             var result = repository.GetDeviceReadings();
@@ -168,22 +204,22 @@ namespace ET.WebApi.Database.Tests.Integration.Repositories
         
         private void AddDevicesReadings(DateTimeOffset date1, DateTimeOffset date2)
         {
-            dbContext.AqiReadings.AddRange(
-                new AqiReading { Timestamp = date1, Value = AirQualityIndexValue, DeviceId = Device1Id },
-                new AqiReading { Timestamp = date2, Value = AirQualityIndexValue, DeviceId = Device1Id },
-                new AqiReading { Timestamp = date1, Value = AirQualityIndexValue, DeviceId = Device2Id });
-            dbContext.PressureReadings.AddRange(
-                new PressureReading { Timestamp = date1, Value = PressureValue, DeviceId = Device1Id },
-                new PressureReading { Timestamp = date2, Value = PressureValue, DeviceId = Device1Id },
-                new PressureReading { Timestamp = date1, Value = PressureValue, DeviceId = Device2Id });
-            dbContext.TemperatureReadings.AddRange(
-                new TemperatureReading { Timestamp = date1, Value = TemperatureValue, DeviceId = Device1Id },
-                new TemperatureReading { Timestamp = date2, Value = TemperatureValue, DeviceId = Device1Id },
-                new TemperatureReading { Timestamp = date1, Value = TemperatureValue, DeviceId = Device2Id });
-            dbContext.HumidityReadings.AddRange(
-                new HumidityReading { Timestamp = date1, Value = HumidityValue, DeviceId = Device1Id },
-                new HumidityReading { Timestamp = date2, Value = HumidityValue, DeviceId = Device1Id },
-                new HumidityReading { Timestamp = date1, Value = HumidityValue, DeviceId = Device2Id });
+            dbContext.NumericReadings.AddRange(
+                new NumericReading { Timestamp = date1, Value = AirQualityIndexValue, ReadingType = NumericReadingType.AirQualityIndex, DeviceId = Device1Id },
+                new NumericReading { Timestamp = date2, Value = AirQualityIndexValue, ReadingType = NumericReadingType.AirQualityIndex, DeviceId = Device1Id },
+                new NumericReading { Timestamp = date1, Value = AirQualityIndexValue, ReadingType = NumericReadingType.AirQualityIndex, DeviceId = Device2Id });
+            dbContext.NumericReadings.AddRange(
+                new NumericReading { Timestamp = date1, Value = PressureValue, ReadingType = NumericReadingType.Pressure, DeviceId = Device1Id },
+                new NumericReading { Timestamp = date2, Value = PressureValue, ReadingType = NumericReadingType.Pressure, DeviceId = Device1Id },
+                new NumericReading { Timestamp = date1, Value = PressureValue, ReadingType = NumericReadingType.Pressure, DeviceId = Device2Id });
+            dbContext.NumericReadings.AddRange(
+                new NumericReading { Timestamp = date1, Value = TemperatureValue, ReadingType = NumericReadingType.Temperature, DeviceId = Device1Id },
+                new NumericReading { Timestamp = date2, Value = TemperatureValue, ReadingType = NumericReadingType.Temperature, DeviceId = Device1Id },
+                new NumericReading { Timestamp = date1, Value = TemperatureValue, ReadingType = NumericReadingType.Temperature, DeviceId = Device2Id });
+            dbContext.NumericReadings.AddRange(
+                new NumericReading { Timestamp = date1, Value = HumidityValue, ReadingType = NumericReadingType.Humidity,  DeviceId = Device1Id },
+                new NumericReading { Timestamp = date2, Value = HumidityValue, ReadingType = NumericReadingType.Humidity, DeviceId = Device1Id },
+                new NumericReading { Timestamp = date1, Value = HumidityValue, ReadingType = NumericReadingType.Humidity, DeviceId = Device2Id });
             dbContext.SaveChanges();
         }
     }

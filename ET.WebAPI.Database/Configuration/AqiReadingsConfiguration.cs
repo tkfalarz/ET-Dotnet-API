@@ -4,12 +4,12 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace ET.WebAPI.Database.EntitiesConfiguration
 {
-    internal class AqiReadingsConfiguration : IEntityTypeConfiguration<AqiReading>
+    internal class AqiReadingsConfiguration : IEntityTypeConfiguration<NumericReading>
     {
-        public void Configure(EntityTypeBuilder<AqiReading> builder)
+        public void Configure(EntityTypeBuilder<NumericReading> builder)
         {
             builder
-                .HasKey(x => new { x.Timestamp, x.Value, x.DeviceId })
+                .HasKey(x => new { x.ReadingType, x.Timestamp, x.Value, x.DeviceId })
                 .IsClustered();
         }
     }

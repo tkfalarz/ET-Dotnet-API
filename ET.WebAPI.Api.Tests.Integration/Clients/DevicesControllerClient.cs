@@ -1,6 +1,7 @@
 using ET.WebAPI.Api.Tests.Integration.Auth;
 using ET.WebAPI.Api.Views;
 using ET.WebAPI.Database;
+using ET.WebAPI.Kernel.DomainModels;
 using ET.WebAPI.TestsUtilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -47,6 +48,23 @@ namespace ET.WebAPI.Api.Tests.Integration.Clients
         public async Task<HttpResponseMessage> StoreDeviceAsync(DeviceView content)
             => await HttpClient.PostAsync(new Uri(BaseUrl, UriKind.Relative), JsonContent.Create(content));
 
-        private string ConnectionString => TestDbConnectionStringProvider.GetConnectionString($"{nameof(DevicesControllerClient)}-WebApiTests");
+        public async Task<HttpResponseMessage> GetDevicesAsync() => await HttpClient.GetAsync("api/Devices");
+
+        public async Task<HttpResponseMessage> GetDeviceAsync(string deviceName) => await HttpClient.GetAsync($"api/Devices/{deviceName}");
+
+        public async Task<HttpResponseMessage> GetDeviceReadingsAsync(string deviceName)
+            => await HttpClient.GetAsync($"api/Devices/{deviceName}/Readings");
+
+        public async Task<HttpResponseMessage> GetDeviceLatestReadingsAsync(string deviceName)
+            => await HttpClient.GetAsync($"api/Devices/{deviceName}/Readings/Latest");
+
+        public async Task<HttpResponseMessage> GetDeviceWeatherFactorReadingsAsync(string deviceName, ReadingType readingType)
+            => await HttpClient.GetAsync($"api/Devices/{deviceName}/Readings/{readingType}");
+
+        public async Task<HttpResponseMessage> GetDeviceLatestWeatherFactorReadingsAsync(string deviceName, ReadingType readingType)
+            => await HttpClient.GetAsync($"api/Devices/{deviceName}/Readings/{readingType}/Latest");
+
+        private static string ConnectionString 
+            => TestDbConnectionStringProvider.GetConnectionString($"{nameof(DevicesControllerClient)}-WebApiTests");
     }
 }

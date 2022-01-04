@@ -7,10 +7,11 @@ namespace ET.WebAPI.Kernel.DomainServices
 {
     public interface IReadingsService
     {
-        Task<OperationResult> StoreWeatherReadingAsync(Reading reading);
-
-        Task<Reading> GetNearestLatestReadingAsync(decimal latitude, decimal longitude);
-        Task<List<Reading>> GetLatestReadingsAsync();
-        Task<Reading[]> GetDeviceReadingsAsync(string deviceName, int limit);
+        Task<OperationResult> StoreReadingSetAsync(ReadingSet readingSet);
+        Task<ReadingSet> GetLatestReadingsAsync(string deviceName);
+        Task<ReadingSet> GetNearestLatestReadingsAsync(decimal latitude, decimal longitude);
+        Task<IReadOnlyList<ReadingSet>> GetReadingsAsync(string deviceName, int limit);
+        Task<Reading> GetTypedLatestReadingAsync(string deviceName, ReadingType readingType);
+        Task<IReadOnlyList<Reading>> GetTypedReadingsAsync(string deviceName, ReadingType readingType, int limit);
     }
 }

@@ -23,24 +23,24 @@ namespace ET.WebAPI.BusinessLogic.Services
             this.devicesRepository = devicesRepository;
         }
 
-        public async Task<OperationResult> StoreWeatherReadingAsync(Reading reading)
+        public async Task<OperationResult> StoreReadingSetAsync(ReadingSet readingSet)
         {
-            if (reading == null) throw new ArgumentNullException(nameof(reading));
+            if (readingSet == null) throw new ArgumentNullException(nameof(readingSet));
 
             var deviceId = await devicesRepository
                 .GetDevices()
-                .Where(x=>x.DeviceName == reading.DeviceName)
+                .Where(x=>x.DeviceName == readingSet.DeviceName)
                 .Select(x=>x.DeviceId).FirstOrDefaultAsync();
             if (deviceId == default)
-                return OperationResult.Failure($"Device {reading.DeviceName} not found", ErrorType.BusinessLogic);
+                return OperationResult.Failure($"Device {readingSet.DeviceName} not found", ErrorType.BusinessLogic);
 
-            var weatherReading = new Reading
+            var weatherReading = new ReadingSet
             {
-                Humidity = reading.Humidity,
-                Pressure = reading.Pressure,
-                Temperature = reading.Temperature,
-                Timestamp = reading.Timestamp,
-                AirQualityIndex = reading.AirQualityIndex
+                Humidity = readingSet.Humidity,
+                Pressure = readingSet.Pressure,
+                Temperature = readingSet.Temperature,
+                Timestamp = readingSet.Timestamp,
+                AirQualityIndex = readingSet.AirQualityIndex
             };
 
             try
@@ -55,11 +55,22 @@ namespace ET.WebAPI.BusinessLogic.Services
             return OperationResult.Proceeded();
         }
 
-        public async Task<Reading> GetNearestLatestReadingAsync(decimal latitude, decimal longitude)
+        public async Task<ReadingSet> GetLatestReadingsAsync(string deviceName)
+        {
+            var devices = readingsRepository
+                .GetDeviceReadings()
+                .OrderByDescending(x => x.Timestamp)
+                .Where(x => x.DeviceName == deviceName)
+                .FirstOrDefaultAsync();
+
+            return await devices;
+        }
+
+        public async Task<ReadingSet> GetNearestLatestReadingsAsync(decimal latitude, decimal longitude)
         {
             var devices = await devicesRepository.GetDevices().ToArrayAsync();
             var devicesDistances = new SortedSet<(double distanceFromUserLocation, string deviceName)>();
-            var result = (Reading)default;
+            var result = (ReadingSet)default;
             
             foreach (var device in devices)
             {
@@ -74,56 +85,73 @@ namespace ET.WebAPI.BusinessLogic.Services
                     .OrderByDescending(x=>x.Timestamp)
                     .ToArrayAsync();
                 
-                foreach (var (distance, deviceName) in devicesDistances)
+                foreach (var (_, deviceName) in devicesDistances)
                 {
-                    var filtered = queryable.Where(x=>x.DeviceName==deviceName).Take(1);
-                    if (filtered.Any())
-                    {
-                        result = filtered.First();
-                        break;
-                    }
+                    var filtered = queryable
+                        .Where(x => x.DeviceName == deviceName)
+                        .Take(1)
+                        .ToList();
+
+                    if (!filtered.Any()) continue;
+
+                    result = filtered.First();
+                    break;
                 }
             }
 
             return result;
         }
 
-        public async Task<List<Reading>> GetLatestReadingsAsync()
+        public async Task<IReadOnlyList<ReadingSet>> GetReadingsAsync(string deviceName, int limit)
         {
-            var devicesNames = await devicesRepository.GetDevices().Select(x=>x.DeviceName).ToArrayAsync();
-            var readings = new List<Reading>();
+            var readings = readingsRepository
+                .GetDeviceReadings()
+                .Where(x => x.DeviceName == deviceName)
+                .OrderByDescending(x=>x.Timestamp);
 
-            if (devicesNames.Any())
+            return limit > 0
+                ? await readings.Take(limit).ToListAsync()
+                : await readings.ToListAsync();
+        }
+
+        public Task<Reading> GetTypedLatestReadingAsync(string deviceName, ReadingType readingType)
+        {
+            var result = readingsRepository
+                .GetDeviceReadings()
+                .Where(x => x.DeviceName == deviceName);
+
+            var filtered = NarrowQueryByReadingType(readingType, result);
+
+            return filtered.OrderByDescending(x => x.Timestamp).Take(1).FirstOrDefaultAsync();
+        }
+
+        public async Task<IReadOnlyList<Reading>> GetTypedReadingsAsync(string deviceName, ReadingType readingType, int limit)
+        {
+            var query = readingsRepository
+                .GetDeviceReadings()
+                .Where(x => x.DeviceName == deviceName);
+
+            var filtered = NarrowQueryByReadingType(readingType, query).OrderByDescending(x=>x.Timestamp);
+
+            return limit > 0
+                ? await filtered.Take(limit).ToListAsync()
+                : await filtered.ToListAsync();
+        }
+
+        private static IQueryable<Reading> NarrowQueryByReadingType(ReadingType readingType, IQueryable<ReadingSet> queryable)
+        {
+            var filtered = readingType switch
             {
-                var orderedSensorReadingsQuery =  await readingsRepository
-                    .GetDeviceReadings()
-                    .OrderByDescending(x => x.Timestamp)
-                    .ToArrayAsync();
-                
-                foreach (var deviceName in devicesNames)
-                {
-                    var res = orderedSensorReadingsQuery
-                        .Where(x => x.DeviceName == deviceName)
-                        .Take(1)
-                        .ToArray();
-                
-                    readings.AddRange(res);
-                }
-            }
-
-            return readings;
+                ReadingType.Temperature => queryable.Where(x=>x.Temperature.HasValue).Select(x => new Reading { Timestamp = x.Timestamp, Value = x.Temperature.Value }),
+                ReadingType.Humidity => queryable.Where(x=>x.Humidity.HasValue).Select(x => new Reading { Timestamp = x.Timestamp, Value = x.Humidity.Value }),
+                ReadingType.Pressure => queryable.Where(x=>x.Pressure.HasValue).Select(x => new Reading { Timestamp = x.Timestamp, Value = x.Pressure.Value }),
+                ReadingType.Aqi => queryable.Where(x=>x.AirQualityIndex.HasValue).Select(x => new Reading { Timestamp = x.Timestamp, Value = x.AirQualityIndex.Value }),
+                _ => throw new InvalidOperationException("Not supported reading type")
+            };
+            return filtered;
         }
-
-        public async Task<Reading[]> GetDeviceReadingsAsync(string deviceName, int limit)
-        {
-            var readings = await readingsRepository.GetDeviceReadings().ToArrayAsync();
-            var filteredByDeviceNameQuery = readings.Where(x => x.DeviceName == deviceName);
-            return limit == 0
-                ? filteredByDeviceNameQuery.ToArray()
-                : filteredByDeviceNameQuery.OrderByDescending(x => x.Timestamp).Take(limit).ToArray();
-        }
-
-        private double GetCoordsDistance(decimal latitude, decimal longitude, decimal deviceLatitude, decimal deviceLongitude)
+        
+        private static double GetCoordsDistance(decimal latitude, decimal longitude, decimal deviceLatitude, decimal deviceLongitude)
         {
             var xDiff = Math.Pow((double)latitude - (double)deviceLatitude, 2);
             var yDiff = Math.Pow((double)longitude - (double)deviceLongitude, 2);
